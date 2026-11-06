@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <title>Home · Home Energy</title>
+    <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="css/styles.css?v=15" />
+    <script src="js/theme.js?v=9"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header glass-bar" data-header>
+      <a class="wordmark" href="portal.html" aria-label="Home Energy, home">Home Energy</a>
+
+      <div class="header-actions">
+        <button type="button" class="address-picker in-header" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
+          <span class="tile" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 18 18"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          </span>
+          <span class="meta">
+            <span class="label">Supply address</span>
+            <span class="value" data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+          </span>
+          <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+        </button>
+
+        <div class="segmented" role="radiogroup" aria-label="Appearance" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light" aria-label="Light">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+          </button>
+          <button type="button" role="radio" data-theme-value="dark" aria-label="Dark">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></svg>
+          </button>
+        </div>
+
+        <button type="button" class="avatar" data-sign-out title="Sign out" aria-label="Sign out of Keith Bastian's account">KB</button>
+
+        <button type="button" class="menu-trigger" data-menu-open aria-haspopup="dialog" aria-controls="menu-sheet" aria-expanded="false">
+          Menu
+          <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="side-nav rise" aria-label="Account sections">
+        <a class="nav-item" href="portal.html" aria-current="page">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          <span class="grow">Home</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          Meter readings
+        </a>
+        <a class="nav-item" href="#" data-demo="Bills and payments">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="#" data-demo="Your account">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          Your account
+        </a>
+        <a class="nav-item" href="#" data-demo="Moving out">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <main id="main" class="content-panel">
+        <button type="button" class="address-picker m-address rise" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
+          <span class="tile" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 18 18"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          </span>
+          <span class="meta">
+            <span class="label">Supply address</span>
+            <span class="value" data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+          </span>
+          <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+        </button>
+
+        <section class="hero rise" aria-labelledby="welcome-title">
+          <img class="hero-photo" src="assets/img/hero-home.webp" alt="" />
+          <div class="hero-inner">
+            <span class="status-chip glass-chip">
+              <span class="status-dot" aria-hidden="true"></span>
+              Switch in progress
+            </span>
+
+            <div class="hero-greeting">
+              <span class="eyebrow">Welcome home,</span>
+              <h1 id="welcome-title">Mr Keith Bastian &amp; <br />Mrs Maria Jeronimo Sanchez</h1>
+            </div>
+
+            <div class="hero-meta">
+              <div class="account-chip glass-chip">
+                <span class="k">Account</span>
+                <span class="v" data-account>HE0365222</span>
+                <button type="button" class="icon-btn on-glass" data-copy="HE0365222" aria-label="Copy account number">
+                  <svg class="icon" viewBox="0 0 20 20" aria-hidden="true" style="width: 16px; height: 16px"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5" /><path d="M13.5 3.5V3a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v9.5a1 1 0 0 0 1 1h.5" /></svg>
+                </button>
+              </div>
+              <div class="address-chip glass-chip">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10A6 6 0 0 0 4 8c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2" /></svg>
+                <span data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card prompt rise" aria-labelledby="prompt-title">
+          <div>
+            <h2 id="prompt-title">Submit your opening meter reading</h2>
+            <p>Submit your opening meter reading so we can bill you accurately from the start.</p>
+          </div>
+          <a class="btn btn-primary" href="readings.html">Submit meter reading</a>
+        </section>
+
+        <section class="card switch rise" aria-labelledby="switch-title">
+          <div class="switch-top">
+            <div>
+              <h2 id="switch-title">Good News! Your switch to Home Energy has begun</h2>
+              <p class="muted">Supply start date: <b data-date="supply"></b></p>
+            </div>
+
+            <div class="countdown" role="timer" aria-label="Time until your supply starts" data-countdown>
+              <span class="cap">Your supply starts in</span>
+              <div class="countdown-tiles" aria-hidden="true">
+                <div class="tile-num"><span class="n" data-cd="d">00</span><span class="u">DAYS</span></div>
+                <span class="tile-sep">:</span>
+                <div class="tile-num"><span class="n" data-cd="h">00</span><span class="u">HRS</span></div>
+                <span class="tile-sep">:</span>
+                <div class="tile-num"><span class="n" data-cd="m">00</span><span class="u">MINS</span></div>
+                <span class="tile-sep">:</span>
+                <div class="tile-num"><span class="n" data-cd="s">00</span><span class="u">SECS</span></div>
+              </div>
+              <div class="countdown-text">
+                <span class="big" data-cd-text>8 days 6 hours</span>
+                <span class="muted">Supply start date: <b data-date="supply"></b></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-wrap">
+            <p class="progress-cap" id="progress-title">Your switch progress</p>
+            <ol class="steps" aria-labelledby="progress-title">
+              <li class="step done">
+                <div class="step-rail">
+                  <span class="step-mark">
+                    <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="3,7.5 6,10.5 11,4" /></svg>
+                  </span>
+                  <span class="step-line" aria-hidden="true"></span>
+                </div>
+                <div class="step-body">
+                  <span class="step-title">Switch started <span class="sr-only">(complete)</span></span>
+                  <span class="step-desc">We've received your switch request</span>
+                  <span class="step-date" data-date="started"></span>
+                </div>
+              </li>
+              <li class="step current" aria-current="step">
+                <div class="step-rail">
+                  <span class="step-mark" aria-hidden="true"></span>
+                  <span class="step-line" aria-hidden="true"></span>
+                </div>
+                <div class="step-body">
+                  <span class="step-title">Meter reading window opens</span>
+                  <span class="step-desc">Submit your opening meter reading</span>
+                  <span class="step-date" data-date="window"></span>
+                  <span class="badge">Open now</span>
+                </div>
+              </li>
+              <li class="step">
+                <div class="step-rail">
+                  <span class="step-mark" aria-hidden="true"></span>
+                  <span class="step-line" aria-hidden="true"></span>
+                </div>
+                <div class="step-body">
+                  <span class="step-title">Supply starts</span>
+                  <span class="step-desc">Your electricity supply will go live</span>
+                  <span class="step-date" data-date="supply"></span>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="card promo rise" aria-labelledby="promo-title">
+          <div>
+            <h2 id="promo-title">Stay on top of your account</h2>
+            <p>Check statements, submit meter readings and manage your tariff anytime, anywhere.</p>
+            <p class="cta-line">Download the Home Energy app today.</p>
+            <div class="store-row">
+              <a class="store-badge" href="#" data-demo="App Store link">
+                <small>Download on the</small>
+                <strong>App Store</strong>
+              </a>
+              <a class="store-badge" href="#" data-demo="Google Play link">
+                <small>GET IT ON</small>
+                <strong>Google Play</strong>
+              </a>
+            </div>
+          </div>
+          <div class="promo-art" aria-hidden="true">
+            <div class="mini-phone back">
+              <div class="w">Readings</div>
+              <div class="n">Electricity</div>
+              <div class="c">Last reading<b>04521 kWh</b></div>
+            </div>
+            <div class="mini-phone">
+              <div class="w">Welcome,</div>
+              <div class="n">Mr Keith Bastian</div>
+              <div class="c">Your supply starts in<b data-cd-text>8 days 6 hours</b></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card tips rise" aria-labelledby="tips-title">
+          <h2 id="tips-title">Energy-saving tips just for you</h2>
+          <div class="tips-row" data-tips>
+            <article class="tip">
+              <div class="tip-media"><img src="assets/img/tip-thermostat.jpg" alt="A digital wall thermostat set to 38 degrees" loading="lazy" /></div>
+              <div class="tip-body">
+                <h3 class="tip-title">
+                  <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 3a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0z" /><circle cx="10" cy="14.5" r="1.6" /><line x1="14.5" y1="5" x2="17" y2="5" /><line x1="14.5" y1="8" x2="17" y2="8" /></svg>
+                  Turn it down a notch
+                </h3>
+                <p>Lower your thermostat by just 1°C to save up to 10% on heating bills.</p>
+              </div>
+            </article>
+            <article class="tip">
+              <div class="tip-media"><img src="assets/img/tip-switch.jpg" alt="A white rocker light switch on a wall" loading="lazy" /></div>
+              <div class="tip-body">
+                <h3 class="tip-title">
+                  <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="6" width="16" height="8" rx="4" /><circle cx="6" cy="10" r="2" /></svg>
+                  Switch off, not standby
+                </h3>
+                <p>Devices still use power when idle. Flick the switch and save.</p>
+              </div>
+            </article>
+            <article class="tip">
+              <div class="tip-media"><img src="assets/img/tip-wash.jpg" alt="A white washing machine in a laundry room" loading="lazy" /></div>
+              <div class="tip-body">
+                <h3 class="tip-title">
+                  <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 2s-3.5 4-3.5 6.5a3.5 3.5 0 0 0 7 0C9.5 6 6 2 6 2z" /><path d="M14 9s-3 3.4-3 5.5a3 3 0 0 0 6 0C17 12.4 14 9 14 9z" /></svg>
+                  Wash at 30°C
+                </h3>
+                <p>Washing at 30°C uses less energy and gets most loads just as clean.</p>
+              </div>
+            </article>
+          </div>
+          <div class="dots" aria-hidden="true" data-dots><span class="on"></span><span></span><span></span></div>
+          <button type="button" class="btn btn-primary" data-demo="Energy-saving tips">See all energy-saving tips</button>
+        </section>
+      </main>
+    </div>
+
+    <div class="sheet-backdrop" data-menu-close></div>
+    <div class="menu-sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-label="Menu" data-menu>
+      <div class="sheet-head">
+        <span class="wordmark">Home Energy</span>
+        <button type="button" class="icon-btn" data-menu-close aria-label="Close menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+
+      <nav aria-label="Account sections">
+        <a class="nav-item" href="portal.html" aria-current="page">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          <span class="grow">Home</span>
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          Meter readings
+        </a>
+        <a class="nav-item" href="#" data-demo="Bills and payments">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="#" data-demo="Your account">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          Your account
+        </a>
+        <a class="nav-item" href="#" data-demo="Moving out">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <div class="sheet-section">
+        <span class="cap" id="appearance-label">Appearance</span>
+        <div class="segmented wide" role="radiogroup" aria-labelledby="appearance-label" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light">Light</button>
+          <button type="button" role="radio" data-theme-value="dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <span class="cap">Signed in as Keith Bastian</span>
+        <button type="button" class="btn btn-secondary btn-block" data-sign-out>Sign out</button>
+      </div>
+    </div>
+
+    <div class="sheet-backdrop address-backdrop" data-address-close></div>
+    <div class="address-dialog" id="address-dialog" role="dialog" aria-modal="true" aria-labelledby="address-dialog-title" aria-describedby="address-dialog-lead" aria-hidden="true" data-address-dialog>
+      <div class="sheet-head">
+        <h2 id="address-dialog-title">Switch supply address</h2>
+        <button type="button" class="icon-btn" data-address-close aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <p id="address-dialog-lead">Pick the home you want to manage. The account number on this page changes with the address.</p>
+      <div class="address-options" role="radiogroup" aria-label="Your supply addresses">
+        <label class="address-option is-current">
+          <input type="radio" name="supply-address" value="sandon" checked data-account="HE0365222" data-full="Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2&#160;7UJ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">Flat 2, Sandon Brook Manor</span>
+              <span class="address-option-detail">Sandon Brook Place, Sandon, Chelmsford, CM2&nbsp;7UJ</span>
+              <span class="address-option-account">Account HE0365222</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="woodlands" data-account="HE0148821" data-full="55 Woodlands Road, G46&#160;7JQ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">55 Woodlands Road</span>
+              <span class="address-option-detail">G46&nbsp;7JQ</span>
+              <span class="address-option-account">Account HE0148821</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="tannery" data-account="HE0093310" data-full="7 Tannery Court, Dodworth, Barnsley, South Yorkshire, S75&#160;3DY" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">7 Tannery Court</span>
+              <span class="address-option-detail">Dodworth, Barnsley, South Yorkshire, S75&nbsp;3DY</span>
+              <span class="address-option-account">Account HE0093310</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+      </div>
+      <div class="address-dialog-actions">
+        <button type="button" class="btn btn-secondary" data-address-close>Cancel</button>
+        <button type="button" class="btn btn-primary" data-address-apply disabled>Already selected</button>
+      </div>
+    </div>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script src="js/app.js?v=14"></script>
+  </body>
+</html>
