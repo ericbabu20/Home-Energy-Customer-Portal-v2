@@ -31,5 +31,12 @@
     apply: apply,
   };
 
+  try {
+    var meter = sessionStorage.getItem("he-customer");
+    if (meter === "smart" || meter === "offline" || meter === "trad") {
+      document.documentElement.setAttribute("data-meter", meter);
+    }
+  } catch (e) {}
+
   apply(stored());
 })();

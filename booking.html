@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <title>Get a smart meter · Home Energy</title>
+    <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <script src="js/theme.js?v=10"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header glass-bar" data-header>
+      <a class="wordmark" href="portal.html" aria-label="Home Energy, home">Home Energy</a>
+
+      <div class="header-actions">
+        <button type="button" class="address-picker in-header" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
+          <span class="tile" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 18 18"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          </span>
+          <span class="meta">
+            <span class="label">Supply address</span>
+            <span class="value" data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+          </span>
+          <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+        </button>
+
+        <div class="proto-menu">
+          <button type="button" class="proto-toggle" data-proto-toggle aria-expanded="false" aria-controls="proto-panel">
+            Prototype
+            <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+          </button>
+          <section class="proto-panel" id="proto-panel" data-proto-panel hidden aria-label="Prototype customers">
+            <p class="proto-note">Choose a customer.</p>
+            <div class="proto-choices" role="radiogroup" aria-label="Customer">
+              <button type="button" role="radio" data-customer="smart" aria-checked="true">Smart meter</button>
+              <button type="button" role="radio" data-customer="offline" aria-checked="false">Not communicating</button>
+              <button type="button" role="radio" data-customer="trad" aria-checked="false">Traditional meter</button>
+            </div>
+            <p class="proto-note" data-customer-note></p>
+            <p class="proto-note">Booking outcome</p>
+            <div class="proto-choices" role="radiogroup" aria-label="Booking outcome">
+              <button type="button" role="radio" data-book-scenario="ok" aria-checked="true">Everything works</button>
+              <button type="button" role="radio" data-book-scenario="fail" aria-checked="false">Booking, reschedule or cancel fails</button>
+              <button type="button" role="radio" data-book-scenario="online" aria-checked="false">Can't book online</button>
+              <button type="button" role="radio" data-book-scenario="no-slots" aria-checked="false">No appointments available</button>
+              <button type="button" role="radio" data-book-scenario="notice" aria-checked="false">Appointment is within 2 working days</button>
+            </div>
+            <button type="button" class="link-btn" data-book-reset>Clear the booked appointment</button>
+          </section>
+        </div>
+
+        <div class="segmented" role="radiogroup" aria-label="Appearance" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light" aria-label="Light">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+          </button>
+          <button type="button" role="radio" data-theme-value="dark" aria-label="Dark">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></svg>
+          </button>
+        </div>
+
+        <button type="button" class="avatar" data-sign-out title="Sign out" aria-label="Sign out of Keith Bastian's account">KB</button>
+
+        <button type="button" class="menu-trigger" data-menu-open aria-haspopup="dialog" aria-controls="menu-sheet" aria-expanded="false">
+          Menu
+          <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="side-nav rise" aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html" aria-current="page">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
+        <a class="nav-item" href="portal.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          Home
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          <span class="grow">Meter readings</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
+        <a class="nav-item" href="bills.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="#" data-demo="Your account">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          Your account
+        </a>
+        <a class="nav-item" href="moving-out.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <main id="main" class="content-panel book" data-booking>
+        <h1 class="page-title" tabindex="-1" data-book-heading><span class="page-mark" aria-hidden="true"></span><span data-book-title>Get a smart meter</span></h1>
+
+        <button type="button" class="address-picker m-address bare" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
+          <span class="meta">
+            <span class="label">Supply address</span>
+            <span class="value" data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+          </span>
+          <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+        </button>
+
+        <div class="book-steps" data-book-steps hidden>
+          <p class="book-step" id="book-step" data-book-step>Step 1 of 3: Slot booking</p>
+          <div class="book-progress" role="progressbar" aria-labelledby="book-step" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" data-book-progress>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <!-- Step 1: slot booking -->
+        <section class="book-card" data-view="slots" hidden aria-labelledby="slots-title">
+          <div class="book-head">
+            <h2 id="slots-title">Choose your appointment</h2>
+            <p class="book-lead">Select a date and time window that suits you. Our engineer will arrive within that window.</p>
+          </div>
+
+          <div class="book-site">
+            <p class="book-site-label">
+              <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 16s6-4.4 6-8.2A6 6 0 0 0 3 7.8C3 11.6 9 16 9 16z" /><circle cx="9" cy="7.6" r="1.8" /></svg>
+              Site address
+            </p>
+            <p class="book-site-value" data-site-address>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</p>
+          </div>
+
+          <div class="book-field" data-picker="book">
+            <span class="book-float" id="book-date-label">Select a date</span>
+            <button type="button" class="book-date-btn" data-picker-btn aria-haspopup="listbox" aria-expanded="false" aria-controls="book-dates" aria-labelledby="book-date-label book-date-value">
+              <span id="book-date-value" data-picker-value>Choose a date</span>
+              <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+            </button>
+            <ul class="book-dates" id="book-dates" data-picker-list role="listbox" aria-labelledby="book-date-label" hidden></ul>
+          </div>
+
+          <fieldset class="book-times">
+            <legend>Select time</legend>
+            <div class="book-slots" role="radiogroup" aria-label="Select time" data-slots="book">
+              <button type="button" class="book-slot" role="radio" data-slot="morning" aria-checked="false">Morning, 8AM to 12PM</button>
+              <button type="button" class="book-slot" role="radio" data-slot="afternoon" aria-checked="false">Afternoon, 12PM to 4PM</button>
+            </div>
+          </fieldset>
+
+          <div class="book-actions">
+            <a class="btn btn-secondary" href="readings.html">Back</a>
+            <button type="button" class="btn btn-primary" data-next="property" data-gate="slots" disabled>Continue</button>
+          </div>
+        </section>
+
+        <!-- Step 2: property details -->
+        <section class="book-card" data-view="property" hidden aria-labelledby="property-title">
+          <div class="book-head">
+            <h2 id="property-title">Tell us about your property</h2>
+            <p class="book-lead">These answers help the engineer arrive with the right kit.</p>
+            <p class="book-req">Questions marked with <span class="req" aria-hidden="true">*</span> are mandatory</p>
+          </div>
+
+          <div class="book-questions">
+            <fieldset class="book-q">
+              <legend>Is your meter above head height?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="book-radios" data-question="height" data-label="Meter above head height">
+                <label class="book-radio"><input type="radio" name="height" value="Yes" required /> Yes</label>
+                <label class="book-radio"><input type="radio" name="height" value="No" /> No</label>
+              </div>
+            </fieldset>
+            <fieldset class="book-q">
+              <legend>Are there any pets in the property?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="book-radios" data-question="pets" data-label="Pets">
+                <label class="book-radio"><input type="radio" name="pets" value="Yes" required /> Yes</label>
+                <label class="book-radio"><input type="radio" name="pets" value="No" /> No</label>
+              </div>
+            </fieldset>
+            <fieldset class="book-q">
+              <legend>Are there any parking restrictions?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="book-radios is-stack" data-question="parking" data-label="Parking">
+                <label class="book-radio"><input type="radio" name="parking" value="Permit required" required /> Permit required</label>
+                <label class="book-radio"><input type="radio" name="parking" value="On street parking" /> On street parking</label>
+                <label class="book-radio"><input type="radio" name="parking" value="Pay and display" /> Pay and display</label>
+                <label class="book-radio"><input type="radio" name="parking" value="Other" /> Other</label>
+                <label class="book-radio"><input type="radio" name="parking" value="No" /> No</label>
+              </div>
+            </fieldset>
+            <fieldset class="book-q">
+              <legend>Is it a shared supply?<span class="req" aria-hidden="true">*</span></legend>
+              <div class="book-radios" data-question="shared" data-label="Shared supply">
+                <label class="book-radio"><input type="radio" name="shared" value="Yes" required /> Yes</label>
+                <label class="book-radio"><input type="radio" name="shared" value="No" /> No</label>
+              </div>
+            </fieldset>
+          </div>
+
+          <fieldset class="book-q book-know">
+            <legend>Is there anything we should know?</legend>
+            <div class="book-chips" data-chips>
+              <button type="button" class="book-chip" aria-pressed="false">Medical equipment at home</button>
+              <button type="button" class="book-chip" aria-pressed="false">Disability or mobility need</button>
+              <button type="button" class="book-chip" aria-pressed="false">Hearing or sight loss</button>
+              <button type="button" class="book-chip" aria-pressed="false">Someone over 75 at home</button>
+              <button type="button" class="book-chip" aria-pressed="false">Children under 5 at home</button>
+            </div>
+          </fieldset>
+
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-next="slots">Back</button>
+            <button type="button" class="btn btn-primary" data-next="review" data-gate="property" disabled>Continue</button>
+          </div>
+        </section>
+
+        <!-- Step 3: review and confirm -->
+        <section class="book-card" data-view="review" hidden aria-labelledby="review-title">
+          <div class="book-head">
+            <h2 id="review-title">Review and confirm</h2>
+            <p class="book-lead">Please check your details before confirming your appointment.</p>
+          </div>
+
+          <div class="book-summary">
+            <div class="book-group">
+              <h3 class="book-group-title">
+                <span class="book-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg></span>
+                Meter
+              </h3>
+              <p class="book-fuel">
+                <span class="book-fuel-icons" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 18 18"><path d="M10 1.5 3.5 10H9l-1 6.5L14.5 8H9z" /></svg>
+                  <b>+</b>
+                  <svg class="icon" viewBox="0 0 18 18"><path d="M9 16.5a5 5 0 0 0 5-5c0-3-2.5-4.5-3-8-2 1.5-3.5 3.5-3.5 5.5-1-.5-1.5-1.5-1.5-2.5C4.5 8 4 9.5 4 11.5a5 5 0 0 0 5 5z" /></svg>
+                </span>
+                Electricity &amp; Gas
+              </p>
+            </div>
+
+            <div class="book-group">
+              <h3 class="book-group-title">
+                <span class="book-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><rect x="2.5" y="3.5" width="13" height="12" rx="2" /><path d="M2.5 7.5h13M6 2v3M12 2v3" /></svg></span>
+                Appointment details
+              </h3>
+              <dl class="book-facts">
+                <div><dt>Date &amp; time</dt><dd data-out="when"></dd></div>
+                <div><dt>Address</dt><dd data-site-address></dd></div>
+              </dl>
+            </div>
+
+            <div class="book-group">
+              <h3 class="book-group-title">
+                <span class="book-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg></span>
+                Property details
+              </h3>
+              <dl class="book-answers" data-out="answers"></dl>
+            </div>
+
+            <div class="book-group">
+              <h3 class="book-group-title">
+                <span class="book-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><path d="M9 1.8 3 4v4.5c0 3.6 2.5 6.4 6 7.7 3.5-1.3 6-4.1 6-7.7V4z" /><path d="m6.5 9 1.8 1.8L11.8 7" /></svg></span>
+                Vulnerability
+              </h3>
+              <div data-out="needs"></div>
+            </div>
+          </div>
+
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-next="property">Back</button>
+            <button type="button" class="btn btn-primary" data-act="book">Book appointment</button>
+          </div>
+        </section>
+
+        <!-- Existing appointment -->
+        <section class="book-card" data-view="manage" hidden aria-label="Your appointment">
+          <p class="book-intro">You have an existing smart meter exchange appointment scheduled. If you need to, you can easily amend or cancel your booking. Select the appropriate option below to update your appointment details.</p>
+          <p class="book-note"><b>Please note:</b> We need a minimum of 2 working days' notice to reschedule or cancel your appointment.</p>
+          <div class="book-group">
+            <h2 class="book-sub">Appointment details</h2>
+            <dl class="book-facts">
+              <div><dt>Date &amp; time</dt><dd data-out="when"></dd></div>
+              <div><dt>Address</dt><dd data-site-address></dd></div>
+            </dl>
+          </div>
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-act="start-cancel">Cancel appointment</button>
+            <button type="button" class="btn btn-primary" data-act="start-reschedule">Reschedule appointment</button>
+          </div>
+        </section>
+
+        <!-- Reschedule: choose new slot -->
+        <section class="book-card" data-view="reschedule" hidden aria-label="Choose a new date and time">
+          <p class="book-intro">Choose a new date and time. Your engineer will arrive within the window you pick.</p>
+
+          <div class="book-field" data-picker="move">
+            <span class="book-float" id="move-date-label">Select date</span>
+            <button type="button" class="book-date-btn" data-picker-btn aria-haspopup="listbox" aria-expanded="false" aria-controls="move-dates" aria-labelledby="move-date-label move-date-value">
+              <span class="book-date-lead">
+                <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2" /><path d="M2.5 7.5h13M6 2v3M12 2v3" /></svg>
+                <span id="move-date-value" data-picker-value>DD/MM/YYYY</span>
+              </span>
+              <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+            </button>
+            <ul class="book-dates" id="move-dates" data-picker-list role="listbox" aria-labelledby="move-date-label" hidden></ul>
+          </div>
+
+          <fieldset class="book-times">
+            <legend>Select time</legend>
+            <div class="book-slots" role="radiogroup" aria-label="Select time" data-slots="move">
+              <button type="button" class="book-slot" role="radio" data-slot="morning" aria-checked="false">Morning, 8AM to 12PM</button>
+              <button type="button" class="book-slot" role="radio" data-slot="afternoon" aria-checked="false">Afternoon, 12PM to 4PM</button>
+              <button type="button" class="book-slot" role="radio" data-slot="evening" aria-checked="false">Evening, 4PM to 8PM</button>
+            </div>
+          </fieldset>
+
+          <div class="book-reason">
+            <label class="book-reason-label" for="move-reason">Reason for rescheduling</label>
+            <div class="book-select">
+              <span class="book-float" aria-hidden="true">Select an option</span>
+              <select id="move-reason" data-reason="move">
+                <option value="" selected disabled>Choose a reason</option>
+                <option>I have been unexpectedly called into work</option>
+                <option>I won't be at home at that time</option>
+                <option>Someone else will be at home on another day</option>
+                <option>Other</option>
+              </select>
+              <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+            </div>
+          </div>
+
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-next="manage">Back</button>
+            <button type="button" class="btn btn-primary" data-next="reschedule-review" data-gate="reschedule" disabled>Continue</button>
+          </div>
+        </section>
+
+        <!-- Reschedule: review -->
+        <section class="book-card" data-view="reschedule-review" hidden aria-labelledby="move-review-title">
+          <div class="book-head">
+            <h2 id="move-review-title">Review and confirm</h2>
+            <p class="book-lead">Please check your details before confirming your rescheduled appointment.</p>
+          </div>
+          <div class="book-summary">
+            <div class="book-group">
+              <h3 class="book-sub">Rescheduled appointment details</h3>
+              <dl class="book-facts">
+                <div><dt>Date &amp; time</dt><dd data-out="new-when"></dd></div>
+                <div><dt>Address</dt><dd data-site-address></dd></div>
+              </dl>
+            </div>
+            <div class="book-group">
+              <h3 class="book-sub">Reason for rescheduling</h3>
+              <p class="book-plain" data-out="move-reason"></p>
+            </div>
+          </div>
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-next="reschedule">Back</button>
+            <button type="button" class="btn btn-primary" data-act="reschedule">Reschedule appointment</button>
+          </div>
+        </section>
+
+        <!-- Cancel -->
+        <section class="book-card" data-view="cancel" hidden aria-label="Why you're cancelling">
+          <p class="book-intro">Tell us why you're cancelling. You can book a new appointment any time through your online account.</p>
+          <div class="book-reason">
+            <label class="book-reason-label is-bold" for="cancel-reason">Reason for cancelling</label>
+            <div class="book-select">
+              <span class="book-float" aria-hidden="true">Select</span>
+              <select id="cancel-reason" data-reason="cancel">
+                <option value="" selected disabled>select your reason</option>
+                <option>No longer required</option>
+                <option>Changed supplier</option>
+              </select>
+              <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+            </div>
+          </div>
+          <div class="book-actions">
+            <button type="button" class="btn btn-secondary" data-next="manage">Back</button>
+            <button type="button" class="btn btn-primary" data-act="cancel" data-gate="cancel" disabled>Cancel appointment</button>
+          </div>
+        </section>
+
+        <!-- Unavailable states -->
+        <section class="book-card book-empty" data-view="no-slots" hidden role="status">
+          <span class="book-badge is-alert" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 7v6M12 16.5v.5" /></svg></span>
+          <h2>We're not able to provide you with a smart meter booking right now.</h2>
+          <p>To register your interest in a smart meter, please contact us and we'll be able to help.</p>
+          <button type="button" class="btn btn-primary" data-demo="Contact us">Contact us</button>
+        </section>
+
+        <section class="book-card book-empty" data-view="notice" hidden role="status">
+          <span class="book-badge is-alert" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 7v6M12 16.5v.5" /></svg></span>
+          <h2>We need a minimum of 2 working days' notice to reschedule or cancel your appointment.</h2>
+          <p>To make changes to your appointment, please contact us and we’ll be happy to help.</p>
+          <div class="book-actions is-center">
+            <button type="button" class="btn btn-secondary" data-next="manage">Back</button>
+            <button type="button" class="btn btn-primary" data-demo="Contact us">Contact us</button>
+          </div>
+        </section>
+
+        <dialog class="book-modal" data-book-modal aria-labelledby="book-modal-title" aria-describedby="book-modal-text">
+          <span class="book-badge" data-modal-badge aria-hidden="true"></span>
+          <h2 id="book-modal-title" data-modal-title></h2>
+          <p id="book-modal-text" data-modal-text></p>
+          <p class="book-note" data-modal-note hidden><b>Please note:</b> You'll need to give us 2 working days' notice to reschedule or cancel.</p>
+          <div class="book-actions is-fill" data-modal-actions></div>
+        </dialog>
+      </main>
+    </div>
+
+    <div class="sheet-backdrop" data-menu-close></div>
+    <div class="menu-sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-label="Menu" data-menu>
+      <div class="sheet-head">
+        <span class="wordmark">Home Energy</span>
+        <button type="button" class="icon-btn" data-menu-close aria-label="Close menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+
+      <nav aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html" aria-current="page">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+        </a>
+        <a class="nav-item" href="portal.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          Home
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          <span class="grow">Meter readings</span>
+        </a>
+        <a class="nav-item" href="bills.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="#" data-demo="Your account">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          Your account
+        </a>
+        <a class="nav-item" href="moving-out.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <div class="sheet-section">
+        <span class="cap" id="appearance-label">Appearance</span>
+        <div class="segmented wide" role="radiogroup" aria-labelledby="appearance-label" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light">Light</button>
+          <button type="button" role="radio" data-theme-value="dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <span class="cap">Signed in as Keith Bastian</span>
+        <button type="button" class="btn btn-secondary btn-block" data-sign-out>Sign out</button>
+      </div>
+    </div>
+
+    <div class="sheet-backdrop address-backdrop" data-address-close></div>
+    <div class="address-dialog" id="address-dialog" role="dialog" aria-modal="true" aria-labelledby="address-dialog-title" aria-describedby="address-dialog-lead" aria-hidden="true" data-address-dialog>
+      <div class="sheet-head">
+        <h2 id="address-dialog-title">Switch supply address</h2>
+        <button type="button" class="icon-btn" data-address-close aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <p id="address-dialog-lead">Pick the home you want to manage. The account number on this page changes with the address.</p>
+      <div class="address-options" role="radiogroup" aria-label="Your supply addresses">
+        <label class="address-option is-current">
+          <input type="radio" name="supply-address" value="sandon" checked data-account="HE0365222" data-full="Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2&#160;7UJ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">Flat 2, Sandon Brook Manor</span>
+              <span class="address-option-detail">Sandon Brook Place, Sandon, Chelmsford, CM2&nbsp;7UJ</span>
+              <span class="address-option-account">Account HE0365222</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="woodlands" data-account="HE0148821" data-full="55 Woodlands Road, G46&#160;7JQ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">55 Woodlands Road</span>
+              <span class="address-option-detail">G46&nbsp;7JQ</span>
+              <span class="address-option-account">Account HE0148821</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="tannery" data-account="HE0093310" data-full="7 Tannery Court, Dodworth, Barnsley, South Yorkshire, S75&#160;3DY" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">7 Tannery Court</span>
+              <span class="address-option-detail">Dodworth, Barnsley, South Yorkshire, S75&nbsp;3DY</span>
+              <span class="address-option-account">Account HE0093310</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+      </div>
+      <div class="address-dialog-actions">
+        <button type="button" class="btn btn-secondary" data-address-close>Cancel</button>
+        <button type="button" class="btn btn-primary" data-address-apply disabled>Already selected</button>
+      </div>
+    </div>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script src="js/app.js?v=36"></script>
+  </body>
+</html>

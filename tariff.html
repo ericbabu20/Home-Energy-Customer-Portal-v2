@@ -8,8 +8,8 @@
     <title>Your tariff · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=16" />
-    <script src="js/theme.js?v=9"></script>
+    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <script src="js/theme.js?v=10"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -28,6 +28,22 @@
           </span>
           <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
         </button>
+
+        <div class="proto-menu">
+          <button type="button" class="proto-toggle" data-proto-toggle aria-expanded="false" aria-controls="proto-panel">
+            Prototype
+            <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+          </button>
+          <section class="proto-panel" id="proto-panel" data-proto-panel hidden aria-label="Prototype customers">
+            <p class="proto-note">Choose a customer.</p>
+            <div class="proto-choices" role="radiogroup" aria-label="Customer">
+              <button type="button" role="radio" data-customer="smart" aria-checked="true">Smart meter</button>
+              <button type="button" role="radio" data-customer="offline" aria-checked="false">Not communicating</button>
+              <button type="button" role="radio" data-customer="trad" aria-checked="false">Traditional meter</button>
+            </div>
+            <p class="proto-note" data-customer-note></p>
+          </section>
+        </div>
 
         <div class="segmented" role="radiogroup" aria-label="Appearance" data-theme-control>
           <button type="button" role="radio" data-theme-value="light" aria-label="Light">
@@ -49,6 +65,12 @@
 
     <div class="layout">
       <nav class="side-nav rise" aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
         <a class="nav-item" href="portal.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
           Home
@@ -57,7 +79,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
           Meter readings
         </a>
-        <a class="nav-item" href="#" data-demo="Bills and payments">
+        <a class="nav-item" href="bills.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
           Bills and payments
         </a>
@@ -70,7 +92,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
-        <a class="nav-item" href="#" data-demo="Moving out">
+        <a class="nav-item" href="moving-out.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
           Moving out
         </a>
@@ -81,7 +103,7 @@
       </nav>
 
       <main id="main" class="content-panel tariff" data-tariff>
-        <h1 class="page-title"><span class="page-mark" aria-hidden="true"></span>Your tariff</h1>
+<h1 class="page-title"><span class="page-mark" aria-hidden="true"></span>Your tariff</h1>
 
         <button type="button" class="address-picker m-address bare" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
           <span class="meta">
@@ -91,77 +113,161 @@
           <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
         </button>
 
-        <article class="tariff-card">
-          <h2 class="tariff-name">Fair Variable Dual</h2>
-
-          <section class="tariff-block" aria-labelledby="tariff-details">
-            <h3 id="tariff-details">Details</h3>
-            <dl class="tariff-rows">
-              <div>
-                <dt>Tariff start date</dt>
-                <dd>24th June 2024</dd>
-              </div>
-              <div>
-                <dt>Tariff end date</dt>
-                <dd>No end date</dd>
-              </div>
-              <div>
-                <dt>Tariff type</dt>
-                <dd>Variable</dd>
-              </div>
-              <div>
-                <dt>Payment method</dt>
-                <dd>Direct Debit</dd>
-              </div>
-              <div>
-                <dt>Exit fees</dt>
-                <dd>No exit fees</dd>
-              </div>
-            </dl>
-          </section>
-
-          <section class="tariff-block" aria-labelledby="tariff-rates">
-            <h3 id="tariff-rates">Tariff rates</h3>
-            <div class="rate-grid">
-              <div class="rate-col">
-                <h4>
-                  <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>
-                  Electricity
-                </h4>
-                <p class="rate-label">Standing charge</p>
-                <p class="rate-value">53.35p <span>(per day)</span></p>
-                <p class="rate-label">Unit rate</p>
-                <p class="rate-value">24.50p <span>(per kWh)</span></p>
-              </div>
-              <div class="rate-col">
-                <h4>
-                  <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>
-                  Gas
-                </h4>
-                <p class="rate-label">Standing charge</p>
-                <p class="rate-value">12.81p <span>(per day)</span></p>
-                <p class="rate-label">Unit rate</p>
-                <p class="rate-value">20.76p <span>(per kWh)</span></p>
-              </div>
+        <section class="tariff-hero" aria-labelledby="tariff-name">
+          <div class="tariff-top">
+            <p class="tariff-eyebrow">Current plan</p>
+            <div class="tariff-type">
+              <span class="tariff-chip">Variable tariff</span>
+              <button type="button" class="info-dot" data-tariff-info aria-expanded="false" aria-controls="tariff-type-note" aria-label="About a variable tariff">
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" /><path d="M8 7.2V11.2M8 5h.01" /></svg>
+              </button>
             </div>
-            <p class="vat-note">All rates and prices include VAT at 5% for gas and 0% for electricity. <button type="button" class="link-btn" data-vat aria-expanded="false" aria-controls="vat-more">Know more</button></p>
-            <p class="vat-more" id="vat-more" data-vat-more hidden>Electricity is charged with no VAT. Gas includes VAT at 5%. The prices on this page already include that tax.</p>
-          </section>
+          </div>
+          <div class="tariff-hero-copy">
+            <h2 id="tariff-name" class="tariff-name">Fair Variable Dual</h2>
+            <p class="fuel-pair">
+              <span class="fuel-pair-icons" aria-hidden="true">
+                <span><svg class="icon" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5h6L9 21.5 19.5 10h-6l-.5-7.5z" /></svg></span>
+                <span><svg class="icon" viewBox="0 0 24 24"><path d="M12 21c3.4-1.8 5.2-4.6 5.2-7.6 0-2.6-1.3-4.2-2.6-5.8-.3 2-1.5 2.8-2.4 2.6.3-2.6-.7-4.6-2.6-6.4-.2 3-.9 4.6-2.6 6.2C5.6 12 4.8 13.4 4.8 15.2 4.8 18.6 7.8 21 12 21z" /></svg></span>
+              </span>
+              Electricity and gas
+            </p>
+            <p class="type-note" id="tariff-type-note" data-tariff-note hidden>A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee.</p>
+          </div>
+          <div class="tariff-tenure">
+            <p class="tenure-head">
+              <span>On this tariff since <b><time datetime="2024-06-24">24 June 2024</time></b></span>
+              <strong><span class="sr-only">, which is </span>2 years 4 months</strong>
+            </p>
+            <div class="tenure-line" aria-hidden="true">
+              <span class="tenure-done"></span>
+              <span class="tenure-now"></span>
+              <span class="tenure-open"></span>
+            </div>
+            <div class="tenure-scale" aria-hidden="true">
+              <span>Jun 2024</span>
+              <span>Today</span>
+              <span>No end date</span>
+            </div>
+          </div>
+          <dl class="tariff-facts">
+            <div>
+              <dt>
+                <span class="fact-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M8 3.5v3M16 3.5v3M4 10h16" /></svg>
+                </span>
+                End date
+              </dt>
+              <dd>No end date</dd>
+            </div>
+            <div>
+              <dt>
+                <span class="fact-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24"><path d="M12 3.2 5 6v5.4c0 4.3 2.9 7.4 7 8.6 4.1-1.2 7-4.3 7-8.6V6l-7-2.8z" /><path d="m9 12 2.1 2.1L15.2 10" /></svg>
+                </span>
+                Exit fees
+              </dt>
+              <dd>No exit fees</dd>
+            </div>
+            <div>
+              <dt>
+                <span class="fact-icon" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" /><path d="M3 10h18M7 15h4" /></svg>
+                </span>
+                Payment method
+              </dt>
+              <dd>Direct Debit</dd>
+            </div>
+          </dl>
+        </section>
 
-          <section class="tariff-block" aria-labelledby="tariff-usage">
-            <h3 id="tariff-usage">Estimated annual usage</h3>
-            <div class="usage-grid">
+        <section class="tariff-section" aria-labelledby="tariff-rates">
+          <div class="tariff-section-head">
+            <h2 id="tariff-rates">Tariff rates</h2>
+            <p>Rates from [date]</p>
+          </div>
+          <div class="rate-cards">
+            <article class="rate-card" aria-labelledby="rate-elec">
+              <h3 id="rate-elec" class="rate-head">
+                <span class="fuel-tile" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 18 18"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>
+                </span>
+                Electricity
+              </h3>
+              <dl class="rate-list">
+                <div>
+                  <dt>Standing charge</dt>
+                  <dd>53.35p <span>per day</span></dd>
+                </div>
+                <div>
+                  <dt>Day rate</dt>
+                  <dd>29.47p <span>per kWh</span></dd>
+                </div>
+                <div>
+                  <dt>Night rate</dt>
+                  <dd>14.86p <span>per kWh</span></dd>
+                </div>
+              </dl>
+            </article>
+            <article class="rate-card" aria-labelledby="rate-gas">
+              <h3 id="rate-gas" class="rate-head">
+                <span class="fuel-tile" aria-hidden="true">
+                  <svg class="icon" viewBox="0 0 18 18"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>
+                </span>
+                Gas
+              </h3>
+              <dl class="rate-list">
+                <div>
+                  <dt>Standing charge</dt>
+                  <dd>12.81p <span>per day</span></dd>
+                </div>
+                <div>
+                  <dt>Unit rate</dt>
+                  <dd>20.76p <span>per kWh</span></dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+
+          <div class="vat-callout">
+            <span class="vat-icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" /><path d="M8 7.2V11.2M8 5h.01" /></svg>
+            </span>
+            <div>
+              <p class="vat-note">All rates include VAT: 5% on gas and 0% on electricity. The government has cut VAT on household electricity in Great Britain from 5% to 0% from 1 October 2026 until [end date].</p>
+              <button type="button" class="link-btn" data-vat aria-expanded="false" aria-controls="vat-more">Find out more about the VAT change</button>
+              <p class="vat-more" id="vat-more" data-vat-more hidden>The 0% rate applies to household electricity in Great Britain for this period. Gas stays at 5%. The prices on this page already include that tax.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="usage-card" aria-labelledby="tariff-usage">
+          <div class="tariff-section-head">
+            <h2 id="tariff-usage">Estimated annual usage</h2>
+            <p>Based on [source]</p>
+          </div>
+          <div class="usage-stats">
+            <div class="usage-stat">
+              <span class="fuel-tile" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 18 18"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>
+              </span>
               <div>
                 <p>Electricity</p>
-                <strong>9,185 kWh</strong>
-              </div>
-              <div>
-                <p>Gas</p>
-                <strong>17,000 kWh</strong>
+                <strong>9,185 <em>kWh a year</em></strong>
               </div>
             </div>
-          </section>
-        </article>
+            <div class="usage-stat">
+              <span class="fuel-tile" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 18 18"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>
+              </span>
+              <div>
+                <p>Gas</p>
+                <strong>17,000 <em>kWh a year</em></strong>
+              </div>
+            </div>
+          </div>
+          <p class="usage-legend">Electricity is about 35% of your estimated energy use, and gas is about 65%.</p>
+        </section>
       </main>
     </div>
 
@@ -175,6 +281,11 @@
       </div>
 
       <nav aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+        </a>
         <a class="nav-item" href="portal.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
           Home
@@ -183,7 +294,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
           Meter readings
         </a>
-        <a class="nav-item" href="#" data-demo="Bills and payments">
+        <a class="nav-item" href="bills.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
           Bills and payments
         </a>
@@ -195,7 +306,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
-        <a class="nav-item" href="#" data-demo="Moving out">
+        <a class="nav-item" href="moving-out.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
           Moving out
         </a>
@@ -270,6 +381,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=14"></script>
+    <script src="js/app.js?v=36"></script>
   </body>
 </html>

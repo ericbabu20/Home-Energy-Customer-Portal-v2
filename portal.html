@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#f5f4f0" />
     <title>Home · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=16" />
-    <script src="js/theme.js?v=9"></script>
+    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <script src="js/theme.js?v=10"></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -28,6 +29,22 @@
           </span>
           <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
         </button>
+
+        <div class="proto-menu">
+          <button type="button" class="proto-toggle" data-proto-toggle aria-expanded="false" aria-controls="proto-panel">
+            Prototype
+            <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+          </button>
+          <section class="proto-panel" id="proto-panel" data-proto-panel hidden aria-label="Prototype customers">
+            <p class="proto-note">Choose a customer.</p>
+            <div class="proto-choices" role="radiogroup" aria-label="Customer">
+              <button type="button" role="radio" data-customer="smart" aria-checked="true">Smart meter</button>
+              <button type="button" role="radio" data-customer="offline" aria-checked="false">Not communicating</button>
+              <button type="button" role="radio" data-customer="trad" aria-checked="false">Traditional meter</button>
+            </div>
+            <p class="proto-note" data-customer-note></p>
+          </section>
+        </div>
 
         <div class="segmented" role="radiogroup" aria-label="Appearance" data-theme-control>
           <button type="button" role="radio" data-theme-value="light" aria-label="Light">
@@ -49,6 +66,12 @@
 
     <div class="layout">
       <nav class="side-nav rise" aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
         <a class="nav-item" href="portal.html" aria-current="page">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
           <span class="grow">Home</span>
@@ -58,7 +81,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
           Meter readings
         </a>
-        <a class="nav-item" href="#" data-demo="Bills and payments">
+        <a class="nav-item" href="bills.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
           Bills and payments
         </a>
@@ -70,7 +93,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
-        <a class="nav-item" href="#" data-demo="Moving out">
+        <a class="nav-item" href="moving-out.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
           Moving out
         </a>
@@ -277,6 +300,11 @@
       </div>
 
       <nav aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+        </a>
         <a class="nav-item" href="portal.html" aria-current="page">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
           <span class="grow">Home</span>
@@ -285,7 +313,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
           Meter readings
         </a>
-        <a class="nav-item" href="#" data-demo="Bills and payments">
+        <a class="nav-item" href="bills.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
           Bills and payments
         </a>
@@ -297,7 +325,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
-        <a class="nav-item" href="#" data-demo="Moving out">
+        <a class="nav-item" href="moving-out.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
           Moving out
         </a>
@@ -372,6 +400,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=14"></script>
+    <script src="js/app.js?v=36"></script>
   </body>
 </html>
