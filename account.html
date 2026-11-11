@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f5f4f0" />
+    <title>Your account · Home Energy</title>
+    <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="css/styles.css?v=82" />
+    <script src="js/theme.js?v=10"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header glass-bar" data-header>
+      <a class="wordmark" href="portal.html" aria-label="Home Energy, home">Home Energy</a>
+
+      <div class="header-actions">
+        <button type="button" class="address-picker in-header" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
+          <span class="tile" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 18 18"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          </span>
+          <span class="meta">
+            <span class="label">Supply address</span>
+            <span class="value" data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
+          </span>
+          <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+        </button>
+
+        <div class="proto-menu">
+          <button type="button" class="proto-toggle" data-proto-toggle aria-expanded="false" aria-controls="proto-panel">
+            Prototype
+            <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+          </button>
+          <section class="proto-panel" id="proto-panel" data-proto-panel hidden aria-label="Prototype customers">
+            <p class="proto-note">Choose a customer.</p>
+            <div class="proto-choices" role="radiogroup" aria-label="Customer">
+              <button type="button" role="radio" data-customer="smart" aria-checked="true">Smart meter</button>
+              <button type="button" role="radio" data-customer="offline" aria-checked="false">Not communicating</button>
+              <button type="button" role="radio" data-customer="trad" aria-checked="false">Traditional meter</button>
+            </div>
+            <p class="proto-note" data-customer-note></p>
+          </section>
+        </div>
+
+        <div class="segmented" role="radiogroup" aria-label="Appearance" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light" aria-label="Light">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
+          </button>
+          <button type="button" role="radio" data-theme-value="dark" aria-label="Dark">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z" /></svg>
+          </button>
+        </div>
+
+        <button type="button" class="avatar" data-sign-out title="Sign out" aria-label="Sign out of Keith Bastian's account">KB</button>
+
+        <button type="button" class="menu-trigger" data-menu-open aria-haspopup="dialog" aria-controls="menu-sheet" aria-expanded="false">
+          Menu
+          <span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="side-nav rise" aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
+        <a class="nav-item" href="portal.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          Home
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          Meter readings
+        </a>
+        <a class="nav-item" href="bills.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="account.html" aria-current="page">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          <span class="grow">Your account</span>
+          <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+        </a>
+        <a class="nav-item" href="moving-out.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <main id="main" class="content-panel account" data-acct data-acct-page="menu">
+        <h1 class="page-title acct-title"><span class="page-mark" aria-hidden="true"></span>Your account</h1>
+        <button type="button" class="acct-back" data-acct-back hidden>
+          <svg class="icon" viewBox="0 0 10 16" aria-hidden="true"><polyline points="8,2 2,8 8,14" /></svg>
+          Your account
+        </button>
+
+        <div class="acct-menu" data-acct-menu>
+          <section class="acct-profile" aria-label="Account holder">
+            <h2 data-acct-value="name">Keith Bastian</h2>
+            <div class="acct-number">
+              <span data-account>HE0365222</span>
+              <button type="button" class="acct-copy" data-copy="HE0365222" aria-label="Copy account number">
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="9" height="10" rx="2" /><path d="M3 11V3a2 2 0 0 1 2-2h6" /></svg>
+              </button>
+            </div>
+            <p data-site-address>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</p>
+          </section>
+
+          <h2 class="acct-group-title" id="acct-group-account">Account</h2>
+          <ul class="acct-list" aria-labelledby="acct-group-account">
+            <li>
+              <a class="acct-row" href="#login">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="3.5" y="8.5" width="13" height="9" rx="2" /><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5" /></svg>
+                <span>Login details</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#contact">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="3.5" y="3" width="13" height="15" rx="2" /><circle cx="10" cy="9" r="2.2" /><path d="M6.5 15a3.5 3.5 0 0 1 7 0" /></svg>
+                <span>Contact details</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#billing">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.5 6-10a6 6 0 0 0-12 0c0 4.5 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></svg>
+                <span>Billing address</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#dd">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2" /><path d="M2.5 8.5h15" /></svg>
+                <span>Direct Debit details</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+
+          <h2 class="acct-group-title" id="acct-group-support">Support and preferences</h2>
+          <ul class="acct-list" aria-labelledby="acct-group-support">
+            <li>
+              <a class="acct-row" href="#psr">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 17s-7-4.2-7-9a3.8 3.8 0 0 1 7-2 3.8 3.8 0 0 1 7 2c0 4.8-7 9-7 9z" /></svg>
+                <span>Priority Services Register</span>
+                <span class="acct-pill is-ok" data-acct-psr="yes">Registered</span>
+                <span class="acct-pill" data-acct-psr="no" hidden>Not registered</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#marketing">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8v4h3l8 4V4L6 8z" /></svg>
+                <span>Marketing preferences</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li data-acct-smart-only>
+              <a class="acct-row" href="#smart">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 15a7.5 7.5 0 0 1 15 0" /><line x1="10" y1="15" x2="13" y2="9" /></svg>
+                <span>Smart meter preferences</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#support">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" /><circle cx="10" cy="10" r="3" /><path d="M4.7 4.7l3 3M12.3 12.3l3 3M15.3 4.7l-3 3M7.7 12.3l-3 3" /></svg>
+                <span>Additional support</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+
+          <h2 class="acct-group-title" id="acct-group-help">Help</h2>
+          <ul class="acct-list" aria-labelledby="acct-group-help">
+            <li>
+              <a class="acct-row" href="#contactus">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 2.5h3l1.5 4-2 1.3a9 9 0 0 0 5.7 5.7l1.3-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A15 15 0 0 1 2.5 4.1 1.5 1.5 0 0 1 4 2.5z" /></svg>
+                <span>Contact us</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-row" href="#faqs">
+                <svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" /><path d="M7.8 7.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4" /><circle cx="10" cy="14.3" r=".9" fill="currentColor" stroke="none" /></svg>
+                <span>FAQs</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="acct-grid">
+          <section class="acct-card" data-acct-card="contact" aria-labelledby="acct-contact-title">
+            <div class="acct-card-head"><h2 id="acct-contact-title">Contact details</h2></div>
+            <div class="acct-view" data-acct-view="contact">
+              <dl class="acct-fields">
+                <div><dt>Full name</dt><dd data-acct-value="name"></dd></div>
+                <div><dt>Email</dt><dd data-acct-value="email"></dd></div>
+                <div><dt>Mobile number</dt><dd data-acct-value="mobile"></dd></div>
+                <div><dt>Telephone number</dt><dd data-acct-value="tel"></dd></div>
+              </dl>
+              <div class="acct-actions"><button type="button" class="btn btn-primary" data-acct-edit="contact">Update details</button></div>
+            </div>
+            <form class="acct-view" data-acct-form="contact" novalidate hidden>
+              <div class="acct-alert" role="alert" data-acct-error="contact" hidden><b aria-hidden="true">!</b>We couldn’t save your changes. Please try again.</div>
+              <div class="acct-inputs">
+                <label class="acct-field">Full name
+                  <input autocomplete="name" data-acct-input="name" aria-describedby="acct-err-name" />
+                  <span class="acct-field-error" id="acct-err-name" data-acct-err="name" hidden>Enter your full name</span>
+                </label>
+                <label class="acct-field">Email
+                  <input type="email" autocomplete="email" spellcheck="false" data-acct-input="email" aria-describedby="acct-err-email" />
+                  <span class="acct-field-error" id="acct-err-email" data-acct-err="email" hidden>Enter an email address, like name@example.com</span>
+                </label>
+                <label class="acct-field">Mobile number
+                  <input inputmode="tel" autocomplete="tel" data-acct-input="mobile" aria-describedby="acct-err-mobile" />
+                  <span class="acct-field-error" id="acct-err-mobile" data-acct-err="mobile" hidden>Enter a UK mobile number, like 07700 900000</span>
+                </label>
+                <label class="acct-field"><span>Telephone number <span class="acct-optional">(optional)</span></span>
+                  <input inputmode="tel" autocomplete="tel-national" data-acct-input="tel" aria-describedby="acct-err-tel" />
+                  <span class="acct-field-error" id="acct-err-tel" data-acct-err="tel" hidden>Enter a UK phone number, like 020 7946 0000</span>
+                </label>
+              </div>
+              <div class="acct-actions is-pair">
+                <button type="button" class="btn acct-btn-outline" data-acct-cancel>Cancel</button>
+                <button type="submit" class="btn btn-primary" data-acct-save="contact" aria-disabled="true">Save changes</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="acct-card" data-acct-card="billing" aria-labelledby="acct-billing-title">
+            <div class="acct-card-head"><h2 id="acct-billing-title">Billing address</h2></div>
+            <dl class="acct-fields">
+              <div><dt>Address line 1</dt><dd>42 Oak Tree Lane</dd></div>
+              <div><dt>Address line 2</dt><dd>Flat 3</dd></div>
+              <div><dt>Town or city</dt><dd>Manchester</dd></div>
+              <div><dt>Postcode</dt><dd>M1 1AE</dd></div>
+            </dl>
+            <p class="acct-foot">To update your billing address, please <a href="#contactus" data-acct-contact-link>contact us</a>.</p>
+          </section>
+
+          <section class="acct-card is-wide" data-acct-card="login" aria-labelledby="acct-login-title">
+            <div class="acct-card-head"><h2 id="acct-login-title">Login details</h2></div>
+            <div class="acct-login">
+              <div class="acct-login-box">
+                <div class="acct-login-meta">
+                  <span class="acct-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg></span>
+                  <div><span class="acct-label">Username</span><span class="acct-value" data-acct-username></span></div>
+                </div>
+                <div><button type="button" class="btn btn-primary" data-acct-modal-open="username">Change username</button></div>
+              </div>
+              <div class="acct-login-box">
+                <div class="acct-login-meta">
+                  <span class="acct-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><rect x="3.5" y="8.5" width="13" height="9" rx="2" /><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5" /></svg></span>
+                  <div><span class="acct-label">Password</span><span class="acct-value is-dots"><span aria-hidden="true">••••••••••••</span><span class="sr-only">Hidden</span></span></div>
+                </div>
+                <div><button type="button" class="btn btn-primary" data-acct-modal-open="password">Change password</button></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="acct-card" data-acct-card="marketing" aria-labelledby="acct-mkt-title">
+            <div class="acct-card-head">
+              <div class="acct-head-row">
+                <h2 id="acct-mkt-title">Marketing preferences</h2>
+                <span class="acct-pill is-accent" data-acct-optin>2 of 3 opted in</span>
+              </div>
+              <p class="acct-sub" id="acct-mkt-sub">Choose how you’d like to hear about offers and news. Select at least one.</p>
+            </div>
+            <ul class="acct-prefs" aria-describedby="acct-mkt-sub">
+              <li>
+                <span class="acct-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><rect x="1.5" y="3.5" width="15" height="11" rx="2" /><path d="M2 5l7 5 7-5" /></svg></span>
+                <div class="acct-pref-copy"><b id="acct-pref-email">Email</b><span id="acct-pref-email-desc">Receive updates and offers by email</span></div>
+                <button type="button" class="acct-switch" role="switch" aria-checked="true" aria-labelledby="acct-pref-email" aria-describedby="acct-pref-email-desc" data-acct-pref="email"><span></span></button>
+              </li>
+              <li>
+                <span class="acct-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M4 2.5h3l1.5 4-2 1.3a9 9 0 0 0 5.7 5.7l1.3-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A15 15 0 0 1 2.5 4.1 1.5 1.5 0 0 1 4 2.5z" /></svg></span>
+                <div class="acct-pref-copy"><b id="acct-pref-phone">Telephone calls</b><span id="acct-pref-phone-desc">Receive updates and offers by phone</span></div>
+                <button type="button" class="acct-switch" role="switch" aria-checked="false" aria-labelledby="acct-pref-phone" aria-describedby="acct-pref-phone-desc" data-acct-pref="phone"><span></span></button>
+              </li>
+              <li>
+                <span class="acct-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 18 18"><path d="M2 3.5h14v9H7l-4 3v-3H2z" /><path d="M5.5 7h7M5.5 9.5h4" /></svg></span>
+                <div class="acct-pref-copy"><b id="acct-pref-sms">SMS text message</b><span id="acct-pref-sms-desc">Receive updates and offers by text</span></div>
+                <button type="button" class="acct-switch" role="switch" aria-checked="true" aria-labelledby="acct-pref-sms" aria-describedby="acct-pref-sms-desc" data-acct-pref="sms"><span></span></button>
+              </li>
+            </ul>
+            <p class="acct-error" role="alert" data-acct-mkt-none hidden>Select at least one way for us to contact you.</p>
+            <div class="acct-alert" role="alert" data-acct-error="marketing" hidden><b aria-hidden="true">!</b>We couldn’t save your changes. Please try again.</div>
+            <div class="acct-actions" data-acct-view="marketing">
+              <button type="button" class="btn btn-primary" data-acct-edit="marketing">Update preferences</button>
+            </div>
+            <div class="acct-actions is-pair" data-acct-form="marketing" hidden>
+              <button type="button" class="btn acct-btn-outline" data-acct-cancel>Cancel</button>
+              <button type="button" class="btn btn-primary" data-acct-save="marketing" aria-disabled="true">Save changes</button>
+            </div>
+          </section>
+
+          <section class="acct-card" data-acct-card="dd" aria-labelledby="acct-dd-title">
+            <div class="acct-card-head">
+              <div class="acct-head-row">
+                <h2 id="acct-dd-title">Direct Debit details</h2>
+                <img class="acct-dd-logo" src="assets/direct-debit-logo.png" width="158" height="100" alt="Direct Debit" />
+              </div>
+            </div>
+            <div class="acct-view" data-acct-dd="set">
+              <dl class="acct-rows">
+                <div><dt>Account holder</dt><dd data-acct-dd-value="holder"></dd></div>
+                <div><dt>Account number</dt><dd>Ending •••• <span data-acct-dd-value="last4"></span></dd></div>
+                <div><dt>Sort code</dt><dd>••-••-<span data-acct-dd-value="sortEnd"></span></dd></div>
+                <div><dt>Payment date</dt><dd data-acct-dd-value="day"></dd></div>
+                <div><dt>Monthly amount</dt><dd>£[xx.xx]</dd></div>
+              </dl>
+              <div class="acct-actions"><button type="button" class="btn btn-primary" data-acct-modal-open="bank">Change bank details</button></div>
+            </div>
+            <div class="acct-view" data-acct-dd="none" hidden>
+              <div class="acct-empty">
+                <b>No Direct Debit set up</b>
+                <span>Set up a Direct Debit to pay automatically each month.</span>
+              </div>
+              <div class="acct-actions">
+                <a class="btn btn-primary" href="tariff-journey.html?journey=dd&amp;from=account" data-acct-dd-journey>Set up Direct Debit</a>
+                <button type="button" class="btn btn-primary" data-acct-modal-open="bank" data-acct-dd-modal hidden>Set up Direct Debit</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="acct-card is-wide" data-acct-card="psr" aria-labelledby="acct-psr-title">
+            <div class="acct-card-head">
+              <div class="acct-head-row">
+                <h2 id="acct-psr-title">Priority Services Register</h2>
+                <span class="acct-pill is-ok" data-acct-psr="yes"><span aria-hidden="true">✓</span> Registered</span>
+                <span class="acct-pill" data-acct-psr="no" hidden>Not registered</span>
+              </div>
+              <p class="acct-sub">Free extra help for people who need it, like advance notice of power cuts.</p>
+            </div>
+            <div class="acct-view" data-acct-psr="yes">
+              <div class="acct-psr-box">
+                <b>You’re on the Priority Services Register</b>
+                <span>Date registered: <span data-acct-psr-date></span></span>
+              </div>
+              <div class="acct-needs">
+                <h3 class="acct-label" id="acct-needs-title">Your support needs</h3>
+                <ul class="acct-chips" aria-labelledby="acct-needs-title" data-acct-needs></ul>
+              </div>
+              <div class="acct-actions is-pair">
+                <button type="button" class="btn acct-btn-outline" data-acct-modal-open="psrRemove">Remove registration</button>
+                <button type="button" class="btn btn-primary" data-acct-modal-open="psr">Update PSR details</button>
+              </div>
+            </div>
+            <div class="acct-view" data-acct-psr="no" hidden>
+              <p class="acct-copy-text">You can join if you’re of pensionable age, have a disability or long-term health condition, or need extra help for another reason.</p>
+              <div class="acct-actions"><button type="button" class="btn btn-primary" data-acct-modal-open="psr">Join the register</button></div>
+            </div>
+          </section>
+
+          <section class="acct-card is-wide" data-acct-card="smart" data-acct-smart-only aria-labelledby="acct-smart-title">
+            <div class="acct-card-head">
+              <h2 id="acct-smart-title">Smart meter preferences</h2>
+              <p class="acct-sub">Choose how often your smart meter sends readings to us.</p>
+            </div>
+            <div class="acct-view" data-acct-view="smart">
+              <div class="acct-fields"><div><span class="acct-label">Reading frequency</span><b class="acct-value" data-acct-freq></b></div></div>
+              <div class="acct-actions"><button type="button" class="btn btn-primary" data-acct-edit="smart">Update preferences</button></div>
+            </div>
+            <div class="acct-view" data-acct-form="smart" hidden>
+              <fieldset class="acct-radios">
+                <legend class="sr-only">How often your smart meter sends readings</legend>
+                <label class="acct-radio"><input type="radio" name="acct-freq" value="half" /><span><b>Half-hourly</b><span>Most detail, helps with smart tariffs</span></span></label>
+                <label class="acct-radio"><input type="radio" name="acct-freq" value="daily" /><span><b>Daily</b><span>A reading once a day</span></span></label>
+                <label class="acct-radio"><input type="radio" name="acct-freq" value="monthly" /><span><b>Monthly</b><span>The minimum needed for accurate bills</span></span></label>
+              </fieldset>
+              <div class="acct-alert" role="alert" data-acct-error="smart" hidden><b aria-hidden="true">!</b>We couldn’t save your changes. Please try again.</div>
+              <div class="acct-actions is-pair">
+                <button type="button" class="btn acct-btn-outline" data-acct-cancel>Cancel</button>
+                <button type="button" class="btn btn-primary" data-acct-save="smart" aria-disabled="true">Save changes</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="acct-card is-wide" data-acct-card="support" aria-labelledby="acct-support-title">
+            <div class="acct-card-head">
+              <h2 id="acct-support-title">Additional support</h2>
+              <p class="acct-sub">Extra help and services for your household</p>
+            </div>
+            <div class="acct-accordion">
+              <div class="acct-acc-item">
+                <h3>
+                  <button type="button" class="acct-acc-btn" aria-expanded="false" aria-controls="acct-acc-whd" data-acct-acc>
+                    Warm Home Discount scheme
+                    <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+                  </button>
+                </h3>
+                <div class="acct-acc-panel" id="acct-acc-whd" hidden>
+                  <p>[Approved copy: who can get the Warm Home Discount and how it’s paid.]</p>
+                  <a href="#" data-demo="Warm Home Discount">Check if you’re eligible</a>
+                </div>
+              </div>
+              <div class="acct-acc-item">
+                <h3>
+                  <button type="button" class="acct-acc-btn" aria-expanded="false" aria-controls="acct-acc-tips" data-acct-acc>
+                    Energy saving tips
+                    <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+                  </button>
+                </h3>
+                <div class="acct-acc-panel" id="acct-acc-tips" hidden>
+                  <p>[Approved copy: simple ways to use less energy at home.]</p>
+                  <a href="#" data-demo="Energy saving tips">See energy saving tips</a>
+                </div>
+              </div>
+              <div class="acct-acc-item">
+                <h3>
+                  <button type="button" class="acct-acc-btn" aria-expanded="false" aria-controls="acct-acc-euk" data-acct-acc>
+                    The Energy UK Vulnerability Commitment
+                    <svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
+                  </button>
+                </h3>
+                <div class="acct-acc-panel" id="acct-acc-euk" hidden>
+                  <p>[Approved copy: what Home Energy has committed to under the Vulnerability Commitment.]</p>
+                  <a href="#" data-demo="Energy UK Vulnerability Commitment">Read our commitment</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="acct-card is-wide acct-mobile-only" data-acct-card="contactus" aria-labelledby="acct-contactus-title">
+            <div class="acct-card-head"><h2 id="acct-contactus-title">Contact us</h2></div>
+            <div class="acct-fields">
+              <div><span class="acct-label">Call us</span><b class="acct-value is-strong">[Phone number]</b><span class="acct-label">[Opening hours]</span></div>
+              <div><span class="acct-label">Email</span><b class="acct-value is-strong">[support email]</b></div>
+            </div>
+            <div class="acct-actions"><button type="button" class="btn btn-primary" data-demo="Send us a message">Send us a message</button></div>
+          </section>
+
+          <section class="acct-card is-wide acct-mobile-only" data-acct-card="faqs" aria-labelledby="acct-faqs-title">
+            <div class="acct-card-head"><h2 id="acct-faqs-title">FAQs</h2></div>
+            <ul class="acct-faqs">
+              <li><a href="#" data-demo="FAQ">[FAQ question 1]<span aria-hidden="true">›</span></a></li>
+              <li><a href="#" data-demo="FAQ">[FAQ question 2]<span aria-hidden="true">›</span></a></li>
+              <li><a href="#" data-demo="FAQ">[FAQ question 3]<span aria-hidden="true">›</span></a></li>
+              <li><a href="#" data-demo="FAQ">[FAQ question 4]<span aria-hidden="true">›</span></a></li>
+            </ul>
+          </section>
+        </div>
+
+        <dialog class="acct-modal" data-acct-modal aria-labelledby="acct-modal-title" aria-describedby="acct-modal-sub">
+          <form class="acct-modal-inner" data-acct-modal-form novalidate>
+            <div class="acct-modal-head">
+              <div>
+                <h2 id="acct-modal-title" data-acct-modal-title></h2>
+                <p id="acct-modal-sub" data-acct-modal-sub></p>
+              </div>
+              <button type="button" class="acct-modal-close" data-acct-modal-close aria-label="Close">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+              </button>
+            </div>
+            <div class="acct-alert" role="alert" data-acct-modal-error hidden><b aria-hidden="true">!</b><span data-acct-modal-error-text></span></div>
+            <div class="acct-modal-body" data-acct-modal-body></div>
+            <div class="acct-actions is-pair is-end">
+              <button type="button" class="btn acct-btn-outline" data-acct-modal-close data-acct-modal-cancel>Cancel</button>
+              <button type="submit" class="btn btn-primary" data-acct-modal-submit aria-disabled="true"></button>
+            </div>
+          </form>
+        </dialog>
+      </main>
+    </div>
+
+    <div class="sheet-backdrop" data-menu-close></div>
+    <div class="menu-sheet" id="menu-sheet" role="dialog" aria-modal="true" aria-label="Menu" data-menu>
+      <div class="sheet-head">
+        <span class="wordmark">Home Energy</span>
+        <button type="button" class="icon-btn" data-menu-close aria-label="Close menu">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+
+      <nav aria-label="Account sections">
+        <a class="nav-item nav-book" href="booking.html">
+          <span class="nav-new">New</span>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 13.5a5.5 5.5 0 1 1 11 0" /><path d="M9 13.2 12 8" /><circle cx="9" cy="13.2" r="0.9" fill="currentColor" stroke="none" /></svg>
+          <span class="grow">Get a smart meter</span>
+        </a>
+        <a class="nav-item" href="portal.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 8l7-6 7 6v8H2z" /><path d="M7 16v-4h4v4" /></svg>
+          Home
+        </a>
+        <a class="nav-item" href="readings.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 14a7 7 0 0 1 14 0" /><line x1="9" y1="14" x2="12" y2="8" /></svg>
+          Meter readings
+        </a>
+        <a class="nav-item" href="bills.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="3" y="1.5" width="12" height="15" rx="2" /><line x1="6" y1="7" x2="12" y2="7" /><line x1="6" y1="11" x2="12" y2="11" /></svg>
+          Bills and payments
+        </a>
+        <a class="nav-item" href="tariff.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
+          Your tariff
+        </a>
+        <a class="nav-item" href="account.html" aria-current="page">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+          Your account
+        </a>
+        <a class="nav-item" href="moving-out.html">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><rect x="1" y="4" width="10" height="9" rx="1" /><path d="M11 7h3l3 3v3h-6z" /><circle cx="4.5" cy="14.5" r="1.5" /><circle cx="13.5" cy="14.5" r="1.5" /></svg>
+          Moving out
+        </a>
+        <a class="nav-item" href="#" data-demo="Help and support">
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
+          Help &amp; support
+        </a>
+      </nav>
+
+      <div class="sheet-section">
+        <span class="cap" id="appearance-label">Appearance</span>
+        <div class="segmented wide" role="radiogroup" aria-labelledby="appearance-label" data-theme-control>
+          <button type="button" role="radio" data-theme-value="light">Light</button>
+          <button type="button" role="radio" data-theme-value="dark">Dark</button>
+        </div>
+      </div>
+
+      <div class="sheet-section">
+        <span class="cap">Signed in as Keith Bastian</span>
+        <button type="button" class="btn btn-secondary btn-block" data-sign-out>Sign out</button>
+      </div>
+    </div>
+
+    <div class="sheet-backdrop address-backdrop" data-address-close></div>
+    <div class="address-dialog" id="address-dialog" role="dialog" aria-modal="true" aria-labelledby="address-dialog-title" aria-describedby="address-dialog-lead" aria-hidden="true" data-address-dialog>
+      <div class="sheet-head">
+        <h2 id="address-dialog-title">Switch supply address</h2>
+        <button type="button" class="icon-btn" data-address-close aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <p id="address-dialog-lead">Pick the home you want to manage. The account number on this page changes with the address.</p>
+      <div class="address-options" role="radiogroup" aria-label="Your supply addresses">
+        <label class="address-option is-current">
+          <input type="radio" name="supply-address" value="sandon" checked data-account="HE0365222" data-full="Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2&#160;7UJ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">Flat 2, Sandon Brook Manor</span>
+              <span class="address-option-detail">Sandon Brook Place, Sandon, Chelmsford, CM2&nbsp;7UJ</span>
+              <span class="address-option-account">Account HE0365222</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="woodlands" data-account="HE0148821" data-full="55 Woodlands Road, G46&#160;7JQ" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">55 Woodlands Road</span>
+              <span class="address-option-detail">G46&nbsp;7JQ</span>
+              <span class="address-option-account">Account HE0148821</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+        <label class="address-option">
+          <input type="radio" name="supply-address" value="tannery" data-account="HE0093310" data-full="7 Tannery Court, Dodworth, Barnsley, South Yorkshire, S75&#160;3DY" />
+          <span class="address-option-card">
+            <span class="address-option-copy">
+              <span class="address-option-title">7 Tannery Court</span>
+              <span class="address-option-detail">Dodworth, Barnsley, South Yorkshire, S75&nbsp;3DY</span>
+              <span class="address-option-account">Account HE0093310</span>
+            </span>
+            <span class="address-current">Current</span>
+          </span>
+        </label>
+      </div>
+      <div class="address-dialog-actions">
+        <button type="button" class="btn btn-secondary" data-address-close>Cancel</button>
+        <button type="button" class="btn btn-primary" data-address-apply disabled>Already selected</button>
+      </div>
+    </div>
+
+    <div class="toast" role="status" aria-live="polite" data-toast></div>
+    <script src="js/app.js?v=50"></script>
+  </body>
+</html>

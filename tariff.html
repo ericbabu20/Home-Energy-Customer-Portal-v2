@@ -8,7 +8,7 @@
     <title>Your tariff · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <link rel="stylesheet" href="css/styles.css?v=82" />
     <script src="js/theme.js?v=10"></script>
   </head>
   <body>
@@ -88,7 +88,7 @@
           <span class="grow">Your tariff</span>
           <svg class="icon chev-r" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
         </a>
-        <a class="nav-item" href="#" data-demo="Your account">
+        <a class="nav-item" href="account.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
@@ -113,18 +113,56 @@
           <svg class="icon chev" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg>
         </button>
 
-        <section class="tariff-hero" aria-labelledby="tariff-name">
+        <section class="notice is-warn tariff-closed" data-tariff-show="closed" hidden role="alert" aria-labelledby="tariff-closed-title">
+          <span class="notice-ico" aria-hidden="true">!</span>
+          <div>
+            <h2 id="tariff-closed-title">We couldn’t apply your selected tariff because the renewal window has closed.</h2>
+            <span>You can still see your current tariff and other tariffs available to you.</span>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" data-tariff-dismiss-closed>View my tariff</button>
+        </section>
+
+        <div class="notice is-info" data-tariff-show="ended" hidden>
+          <span class="notice-ico" aria-hidden="true">i</span>
+          <div><span>Your fixed tariff has ended and you’re now on [standard variable tariff name].</span></div>
+        </div>
+
+        <section class="tariff-cta is-renew" data-tariff-show="renew" hidden aria-labelledby="tariff-renew-title">
+          <span class="tariff-cta-ico" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M8 3.5v3M16 3.5v3M4 10h16M12 13v3l2 1" /></svg>
+          </span>
+          <div class="tariff-cta-copy">
+            <h2 id="tariff-renew-title">Your fixed tariff ends in [48] days</h2>
+            <p>Choose your next tariff by [date]</p>
+          </div>
+          <span class="tj-chip is-warn">[48] days left</span>
+          <a class="btn btn-primary" href="tariff-journey.html?journey=renewal">See renewal options</a>
+        </section>
+
+        <div class="notice is-ok" data-tariff-show="renew-done" hidden>
+          <span class="notice-ico" aria-hidden="true">✓</span>
+          <div><b>Your renewal is confirmed – <span data-tariff-renewed></span> starts on [date]</b></div>
+          <a class="link-btn" href="tariff-journey.html?journey=renewal">Change your choice</a>
+        </div>
+
+        <div class="notice is-info" data-tariff-show="no-options" hidden>
+          <span class="notice-ico" aria-hidden="true">i</span>
+          <div><span>Renewal options aren’t available online right now. Contact us to renew.</span></div>
+          <button type="button" class="btn btn-secondary btn-sm" data-demo="Contact us">Contact us</button>
+        </div>
+
+        <section class="tariff-hero" aria-labelledby="tariff-name" data-tariff-hero>
           <div class="tariff-top">
             <p class="tariff-eyebrow">Current plan</p>
             <div class="tariff-type">
-              <span class="tariff-chip">Variable tariff</span>
+              <span class="tariff-chip" data-tariff-chip>Variable tariff</span>
               <button type="button" class="info-dot" data-tariff-info aria-expanded="false" aria-controls="tariff-type-note" aria-label="About a variable tariff">
                 <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" /><path d="M8 7.2V11.2M8 5h.01" /></svg>
               </button>
             </div>
           </div>
           <div class="tariff-hero-copy">
-            <h2 id="tariff-name" class="tariff-name">Fair Variable Dual</h2>
+            <h2 id="tariff-name" class="tariff-name" data-tariff-name>Fair Variable Dual</h2>
             <p class="fuel-pair">
               <span class="fuel-pair-icons" aria-hidden="true">
                 <span><svg class="icon" viewBox="0 0 24 24"><path d="M13 2.5 4.5 13.5h6L9 21.5 19.5 10h-6l-.5-7.5z" /></svg></span>
@@ -132,12 +170,13 @@
               </span>
               Electricity and gas
             </p>
+            <p class="tariff-pending" data-tariff-pending hidden></p>
             <p class="type-note" id="tariff-type-note" data-tariff-note hidden>A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee.</p>
           </div>
-          <div class="tariff-tenure">
+          <div class="tariff-tenure" data-tariff-tenure>
             <p class="tenure-head">
-              <span>On this tariff since <b><time datetime="2024-06-24">24 June 2024</time></b></span>
-              <strong><span class="sr-only">, which is </span>2 years 4 months</strong>
+              <span>On this tariff since <b data-tenure-since>24 June 2024</b></span>
+              <strong><span class="sr-only">, which is </span><span data-tenure-length>2 years 4 months</span></strong>
             </p>
             <div class="tenure-line" aria-hidden="true">
               <span class="tenure-done"></span>
@@ -145,9 +184,9 @@
               <span class="tenure-open"></span>
             </div>
             <div class="tenure-scale" aria-hidden="true">
-              <span>Jun 2024</span>
+              <span data-tenure-start>Jun 2024</span>
               <span>Today</span>
-              <span>No end date</span>
+              <span data-tenure-end>No end date</span>
             </div>
           </div>
           <dl class="tariff-facts">
@@ -158,7 +197,7 @@
                 </span>
                 End date
               </dt>
-              <dd>No end date</dd>
+              <dd data-fact-end>No end date</dd>
             </div>
             <div>
               <dt>
@@ -167,7 +206,7 @@
                 </span>
                 Exit fees
               </dt>
-              <dd>No exit fees</dd>
+              <dd data-fact-exit>No exit fees</dd>
             </div>
             <div>
               <dt>
@@ -176,12 +215,32 @@
                 </span>
                 Payment method
               </dt>
-              <dd>Direct Debit</dd>
+              <dd data-fact-pay>Direct Debit</dd>
+              <a class="link-btn on-dark" href="tariff-journey.html?journey=dd" data-tariff-show="pay-link" hidden>Switch to Direct Debit</a>
             </div>
           </dl>
+          <div class="tariff-hero-actions" data-tariff-show="compare" hidden>
+            <a class="btn tariff-ghost" href="tariff-journey.html?journey=change">Compare tariffs</a>
+          </div>
         </section>
 
-        <section class="tariff-section" aria-labelledby="tariff-rates">
+        <section class="tariff-cta is-dd" data-tariff-show="promo" hidden aria-labelledby="tariff-dd-title">
+          <div class="tariff-cta-copy">
+            <h2 id="tariff-dd-title">Switch to Direct Debit</h2>
+            <p>[Benefit copy – Pricing to confirm, e.g. lower rates and less to think about]</p>
+          </div>
+          <ol class="dd-steps">
+            <li><span class="dd-step-num">1</span><b>Choose a tariff</b><span>Pick a Direct Debit tariff</span></li>
+            <li><span class="dd-step-num">2</span><b>Set up Direct Debit</b><span>Add your bank details</span></li>
+            <li><span class="dd-step-num">3</span><b>Confirm</b><span>Review and switch</span></li>
+          </ol>
+          <div class="tariff-cta-actions">
+            <button type="button" class="btn btn-secondary" data-demo="Direct Debit information">Find out more</button>
+            <a class="btn btn-primary" href="tariff-journey.html?journey=dd">Switch to Direct Debit</a>
+          </div>
+        </section>
+
+        <section class="tariff-section" aria-labelledby="tariff-rates" data-tariff-rates>
           <div class="tariff-section-head">
             <h2 id="tariff-rates">Tariff rates</h2>
             <p>Rates from [date]</p>
@@ -241,10 +300,9 @@
           </div>
         </section>
 
-        <section class="usage-card" aria-labelledby="tariff-usage">
+        <section class="usage-card" aria-labelledby="tariff-usage" data-tariff-usage>
           <div class="tariff-section-head">
             <h2 id="tariff-usage">Estimated annual usage</h2>
-            <p>Based on [source]</p>
           </div>
           <div class="usage-stats">
             <div class="usage-stat">
@@ -266,7 +324,14 @@
               </div>
             </div>
           </div>
-          <p class="usage-legend">Electricity is about 35% of your estimated energy use, and gas is about 65%.</p>
+        </section>
+
+        <section class="tariff-entry" data-tariff-show="entry" hidden aria-labelledby="tariff-entry-title">
+          <div>
+            <h2 id="tariff-entry-title">Other tariffs you can switch to</h2>
+            <p>Compare fixed, variable and smart tariffs with your current one.</p>
+          </div>
+          <a class="btn btn-primary" href="tariff-journey.html?journey=change">Compare tariffs</a>
         </section>
       </main>
     </div>
@@ -302,7 +367,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
           Your tariff
         </a>
-        <a class="nav-item" href="#" data-demo="Your account">
+        <a class="nav-item" href="account.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
@@ -381,6 +446,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=36"></script>
+    <script src="js/app.js?v=50"></script>
   </body>
 </html>

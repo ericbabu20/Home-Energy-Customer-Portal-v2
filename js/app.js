@@ -42,35 +42,130 @@
     customerHooks.forEach((fn) => fn(id));
   }
 
+  /* ---------- Tariff journey prototype state ---------- */
+
+  const TARIFF_KEY = "he-tariff";
+  const TARIFF_OUTCOME_KEY = "he-tariff-outcome";
+  const TARIFF_DONE_KEY = "he-tariff-done";
+  const TOAST_KEY = "he-toast";
+  const TARIFF_SCENARIOS = {
+    change: "Change tariff",
+    renewal: "Tariff renewal",
+    pob: "Pay on bill to Direct Debit",
+  };
+  const TARIFF_NOTES = {
+    change: "On a variable tariff, paying by Direct Debit. Compare tariffs is on Your tariff.",
+    renewal: "On a fixed tariff that ends soon. See renewal options is on Home and Your tariff.",
+    pob: "Paying on bill. Switch to Direct Debit is on Home and Your tariff.",
+  };
+  const TARIFF_OUTCOMES = {
+    change: [
+      ["ok", "Everything works"],
+      ["unavailable", "Tariff is no longer available"],
+      ["fail", "Tariff change fails"],
+    ],
+    renewal: [
+      ["ok", "Everything works"],
+      ["moved", "Fixed tariff ends while choosing"],
+      ["closed", "Renewal window closes"],
+      ["ended", "Fixed tariff has already ended"],
+      ["noOptions", "No renewal options online"],
+      ["fail", "Renewal fails"],
+    ],
+    pob: [
+      ["ok", "Everything works"],
+      ["inelig", "Can’t set up Direct Debit online"],
+      ["bankFail", "Bank details can’t be checked"],
+      ["partial", "Tariff changes, Direct Debit fails"],
+      ["fail", "Everything fails"],
+    ],
+  };
+  const TARIFFS = {
+    fx1: { name: "[Fixed tariff name A]", kind: "Fixed", group: "fixed", best: true, cmp: "cheaper", diff: 353, month: 468.5, term: "Fixed for [12] months", end: "[end date]", exit: "£75 per fuel", exitFee: "£75", fuels: ["elec", "gas"], rates: { elec: [51.2, 23.1], gas: [29.62, 19.4] } },
+    fx2: { name: "[Fixed tariff name B]", kind: "Fixed", group: "fixed", cmp: "more", diff: 172, month: 512.25, term: "Fixed for [24] months", end: "[end date]", exit: "£100 per fuel", exitFee: "£100", fuels: ["elec", "gas"], rates: { elec: [52.8, 25.9], gas: [30.15, 21.05] } },
+    fx3: { name: "[Fixed tariff name C]", kind: "Fixed", group: "fixed", cmp: "cheaper", diff: 216, month: 479.9, term: "Fixed for [18] months", end: "[end date]", exit: "£50 per fuel", exitFee: "£50", fuels: ["elec", "gas"], rates: { elec: [50.95, 24.1], gas: [29.8, 19.85] } },
+    vr1: { name: "[Variable tariff name]", kind: "Variable", group: "variable", cmp: "cheaper", diff: 95, month: 489.95, term: "Prices follow the Ofgem price cap", end: "No end date", exit: "", fuels: ["elec", "gas"], rates: { elec: [53.35, 24.5], gas: [32.67, 20.1] } },
+    sm1: { name: "[Smart tariff name A]", kind: "Smart", group: "smart", cmp: "more", diff: 86, month: 505.1, term: "Fixed for [12] months", end: "[end date]", exit: "£75 per fuel", exitFee: "£75", fuels: ["elec", "gas"], dayNight: true, rates: { elec: [54.1, 30.2, 13.5], gas: [31.2, 20.9] } },
+    cur: { name: "Fair Variable Dual", kind: "Variable", group: "variable", current: true, month: 497.85, term: "Prices follow the Ofgem price cap", end: "No end date", exit: "", fuels: ["elec", "gas"], dayNight: true, rates: { elec: [53.35, 29.47, 14.86], gas: [12.81, 20.76] } },
+    curFixed: { name: "[Current fixed tariff name]", kind: "Fixed", group: "fixed", current: true, month: 482.4, term: "Fixed for [12] months", end: "[end date]", exit: "£60 per fuel", exitFee: "£60", fuels: ["elec", "gas"], dayNight: true, rates: { elec: [50.1, 27.8, 13.95], gas: [28.9, 18.7] } },
+  };
+
+  const gbp = (n) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const pence = (n) => `${n.toFixed(2)}p`;
+
+  function tariffScenario() {
+    const id = sessionStorage.getItem(TARIFF_KEY);
+    return TARIFF_SCENARIOS[id] ? id : "change";
+  }
+
+  function tariffOutcome() {
+    const id = sessionStorage.getItem(TARIFF_OUTCOME_KEY);
+    return TARIFF_OUTCOMES[tariffScenario()].some(([value]) => value === id) ? id : "ok";
+  }
+
+  function tariffDone() {
+    try {
+      return JSON.parse(sessionStorage.getItem(TARIFF_DONE_KEY)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function setTariffDone(patch) {
+    sessionStorage.setItem(TARIFF_DONE_KEY, JSON.stringify({ ...tariffDone(), ...patch }));
+  }
+
+  const tariffHooks = [];
+  function onTariffChange(fn) {
+    tariffHooks.push(fn);
+  }
+
+  function paintTariffControls() {
+    const scenario = tariffScenario();
+    const outcome = tariffOutcome();
+    $$("[data-tariff-scenario]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffScenario === scenario)));
+    const note = $("[data-tariff-scenario-note]");
+    if (note) note.textContent = TARIFF_NOTES[scenario];
+    const box = $("[data-tariff-outcomes]");
+    if (!box) return;
+    box.replaceChildren(
+      ...TARIFF_OUTCOMES[scenario].map(([value, label]) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.setAttribute("role", "radio");
+        btn.dataset.tariffOutcome = value;
+        btn.setAttribute("aria-checked", String(value === outcome));
+        btn.textContent = label;
+        return btn;
+      })
+    );
+  }
+
+  function changeTariffPrototype(scenario, outcome) {
+    sessionStorage.setItem(TARIFF_KEY, scenario);
+    if (outcome && outcome !== "ok") sessionStorage.setItem(TARIFF_OUTCOME_KEY, outcome);
+    else sessionStorage.removeItem(TARIFF_OUTCOME_KEY);
+    sessionStorage.removeItem(TARIFF_DONE_KEY);
+    paintTariffControls();
+    tariffHooks.forEach((fn) => fn());
+  }
+
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-  /* The supply line keeps the full postcode and shortens the start.
-     Phone: 15 characters. Tablet: 20. Desktop: 30, or the whole address if it already fits. */
-  function deviceTypeFor(width) {
-    if (width < 768) return "mobile";
-    if (width <= 1024) return "tablet";
-    return "desktop";
-  }
-
-  function truncateAddress(fullAddress, maxLength, deviceType) {
-    const limits = { mobile: 15, tablet: 20, desktop: 30 };
-    const limit = Object.prototype.hasOwnProperty.call(limits, deviceType) ? limits[deviceType] : maxLength;
+  /* Split a supply address so the street can shrink and the postcode stays whole. */
+  function splitAddress(fullAddress) {
     const address = String(fullAddress || "")
       .replace(/\u00a0/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-    if (!address || address.length <= limit) return address;
-
     const match = address.match(/^(.*?)(?:,\s*)?([A-Z]{1,2}\d[A-Z\d]{0,2})\s+(\d[A-Z]{2})$/i);
-    if (!match) return `${address.slice(0, Math.max(0, limit - 3))}...`;
-
-    const postcode = `${match[2].toUpperCase()} ${match[3].toUpperCase()}`.slice(0, 8);
-    const prefix = match[1].replace(/[\s,]+$/, "");
-    const available = limit - postcode.length - 5;
-    const start = prefix.slice(0, Math.max(0, available));
-    const result = `${start}..., ${postcode}`;
-    return result.length <= limit ? result : result.slice(0, limit);
+    if (!match) return { address, start: address, postcode: "" };
+    return {
+      address,
+      start: match[1].replace(/[\s,]+$/, ""),
+      postcode: `${match[2].toUpperCase()} ${match[3].toUpperCase()}`,
+    };
   }
 
   /* ---------- Toast ---------- */
@@ -342,16 +437,65 @@
 
     let fullAddress = "";
 
+    function lineParts(el) {
+      let start = el.querySelector(".value-start");
+      let postcode = el.querySelector(".value-postcode");
+      if (!start || !postcode) {
+        el.replaceChildren();
+        start = document.createElement("span");
+        start.className = "value-start";
+        postcode = document.createElement("span");
+        postcode.className = "value-postcode";
+        el.append(start, postcode);
+      }
+      return { start, postcode };
+    }
+
+    function fitSupplyLine(el, parts) {
+      const street = parts.start || parts.address;
+      const tail = parts.postcode ? `, ${parts.postcode}` : "";
+      const { start, postcode } = lineParts(el);
+      postcode.textContent = tail;
+      if (el.clientWidth <= 0) {
+        start.textContent = street;
+        return;
+      }
+      const room = el.clientWidth - postcode.offsetWidth;
+      if (room <= 8) {
+        start.textContent = "";
+        postcode.textContent = parts.postcode || street;
+        return;
+      }
+      start.textContent = street;
+      if (start.scrollWidth <= room) return;
+      let low = 0;
+      let high = street.length;
+      let best = "…";
+      while (low <= high) {
+        const mid = Math.floor((low + high) / 2);
+        const candidate = `${street.slice(0, mid).replace(/[\s,]+$/, "")}…`;
+        start.textContent = candidate;
+        if (start.scrollWidth <= room) {
+          best = candidate;
+          low = mid + 1;
+        } else {
+          high = mid - 1;
+        }
+      }
+      start.textContent = best;
+    }
+
     function showAddress(full) {
-      fullAddress = String(full || "")
-        .replace(/\u00a0/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-      const shown = truncateAddress(fullAddress, undefined, deviceTypeFor(window.innerWidth));
+      const parts = splitAddress(full);
+      fullAddress = parts.address;
       $$("[data-supply-line]").forEach((el) => {
-        el.textContent = shown;
         el.title = fullAddress;
         el.dataset.addressFull = fullAddress;
+        if (el.closest(".address-chip")) {
+          el.textContent = fullAddress;
+          return;
+        }
+        fitSupplyLine(el, parts);
       });
       $$("[data-site-address]").forEach((el) => {
         el.textContent = fullAddress;
@@ -449,9 +593,12 @@
     }
 
     paint(storedId());
-    window.addEventListener("resize", () => {
-      if (fullAddress) showAddress(fullAddress);
+    const addressWatcher = new ResizeObserver(() => {
+      if (!fullAddress) return;
+      const parts = splitAddress(fullAddress);
+      $$(".address-picker [data-supply-line]").forEach((el) => fitSupplyLine(el, parts));
     });
+    $$(".address-picker").forEach((picker) => addressWatcher.observe(picker));
 
     $$("[data-address-open]").forEach((btn) => {
       btn.addEventListener("click", () => open(btn));
@@ -624,7 +771,7 @@
       const shortPoint = data.pointLabel.startsWith("Meter Point Reference") ? "MPRN" : "MPAN";
       const rows = [
         [shortPoint, data.point, data.pointLabel],
-        ["Serial", data.serial, "Meter serial number"],
+        ["Meter serial number", data.serial, "Meter serial number"],
       ];
       ids.innerHTML = rows
         .map(
@@ -1132,6 +1279,110 @@
         info.setAttribute("aria-expanded", String(open));
       });
     }
+    paintTariffPage();
+  }
+
+  function paintTariffPage() {
+    const hero = $("[data-tariff-hero]");
+    if (!hero) return;
+    const rateCells = $$("[data-tariff-rates] .rate-list dd").map((dd) => ({ node: dd.firstChild, text: dd.firstChild.textContent }));
+    let closedDismissed = false;
+    const set = (sel, text) => {
+      const el = $(sel);
+      if (el) el.textContent = text;
+    };
+
+    function paint() {
+      const scenario = tariffScenario();
+      const outcome = tariffOutcome();
+      const done = tariffDone();
+      const renewal = scenario === "renewal";
+      const fixed = renewal && outcome !== "ended";
+      const ddDone = scenario === "pob" && Boolean(done.dd);
+      const closed = renewal && outcome === "closed" && done.closed;
+      const show = {
+        closed: closed && !closedDismissed,
+        ended: renewal && outcome === "ended",
+        renew: fixed && !done.renewal && !closed && outcome !== "noOptions",
+        "renew-done": renewal && Boolean(done.renewal),
+        "no-options": renewal && outcome === "noOptions" && !done.renewal,
+        "pay-link": scenario === "pob" && !ddDone,
+        promo: scenario === "pob" && !ddDone,
+        compare: scenario === "change" || (renewal && (outcome === "ended" || closed)),
+        entry: scenario === "change" || (renewal && (outcome === "ended" || closed)),
+      };
+      $$("[data-tariff-show]").forEach((el) => {
+        el.hidden = !show[el.dataset.tariffShow];
+      });
+      [hero, $("[data-tariff-rates]"), $("[data-tariff-usage]")].forEach((el) => {
+        if (el) el.hidden = show.closed;
+      });
+
+      set("[data-tariff-chip]", fixed ? "Fixed tariff" : "Variable tariff");
+      set("[data-tariff-name]", fixed ? "[Current fixed tariff name]" : renewal ? "[Standard variable tariff name]" : "Fair Variable Dual");
+      set("[data-tenure-since]", fixed ? "[start date]" : renewal ? "[date]" : "24 June 2024");
+      set("[data-tenure-length]", fixed ? "[48] days left" : renewal ? "" : "2 years 4 months");
+      set("[data-tenure-start]", fixed ? "[Start month]" : renewal ? "[Start month]" : "Jun 2024");
+      set("[data-tenure-end]", fixed ? "[End date]" : "No end date");
+      set("[data-fact-end]", fixed ? "[end date]" : "No end date");
+      set("[data-fact-exit]", fixed ? TARIFFS.curFixed.exit : "No exit fees");
+      set("[data-fact-pay]", scenario === "pob" && !ddDone ? "Pay on bill" : "Direct Debit");
+      set(
+        "[data-tariff-note]",
+        fixed
+          ? "A fixed tariff keeps your rates the same until the end date. You pay an exit fee if you leave early."
+          : "A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee."
+      );
+      const info = $("[data-tariff-info]");
+      if (info) info.setAttribute("aria-label", fixed ? "About a fixed tariff" : "About a variable tariff");
+      $("[data-tariff-tenure]").classList.toggle("is-fixed", fixed);
+
+      const pendingId = scenario === "pob" ? done.dd || done.partial : done[scenario];
+      const pending = $("[data-tariff-pending]");
+      if (pending) {
+        pending.hidden = !TARIFFS[pendingId];
+        pending.textContent = TARIFFS[pendingId] ? `Switching to ${TARIFFS[pendingId].name} on [date]` : "";
+      }
+      set("[data-tariff-renewed]", TARIFFS[done.renewal] ? TARIFFS[done.renewal].name : "");
+      const fixedRates = [...TARIFFS.curFixed.rates.elec, ...TARIFFS.curFixed.rates.gas];
+      rateCells.forEach(({ node, text }, i) => {
+        node.textContent = fixed && fixedRates[i] !== undefined ? `${pence(fixedRates[i])} ` : text;
+      });
+    }
+
+    const dismiss = $("[data-tariff-dismiss-closed]");
+    if (dismiss) {
+      dismiss.addEventListener("click", () => {
+        closedDismissed = true;
+        paint();
+        $("[data-tariff-name]").setAttribute("tabindex", "-1");
+        $("[data-tariff-name]").focus();
+      });
+    }
+    onTariffChange(() => {
+      closedDismissed = false;
+      paint();
+    });
+    paint();
+  }
+
+  function initHomeTariff() {
+    const cards = $$("[data-home-tariff]");
+    if (!cards.length) return;
+    function paint() {
+      const scenario = tariffScenario();
+      const outcome = tariffOutcome();
+      const done = tariffDone();
+      cards.forEach((card) => {
+        const kind = card.dataset.homeTariff;
+        let visible = kind === scenario;
+        if (kind === "renewal") visible = visible && !done.renewal && !done.closed && outcome !== "ended";
+        if (kind === "pob") visible = visible && !done.dd;
+        card.hidden = !visible;
+      });
+    }
+    onTariffChange(paint);
+    paint();
   }
 
   function initMovingOut() {
@@ -2077,6 +2328,685 @@
     start();
   }
 
+  /* ---------- Tariff journeys: change, renewal, pay on bill to Direct Debit ---------- */
+
+  function initTariffJourney() {
+    const root = $("[data-tj]");
+    if (!root) return;
+    const params = new URLSearchParams(location.search);
+    const EXIT_URLS = { home: "portal.html", account: "account.html" };
+    const exitUrl = EXIT_URLS[params.get("from")] || "tariff.html";
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const SCENARIO_FOR = { renewal: "renewal", dd: "pob" };
+    const JOURNEY_FOR = { change: "change", renewal: "renewal", pob: "dd" };
+    const DESC = "[Two-line tariff description. Short summary of what makes this tariff different and who it suits best.]";
+    const DAYS = Array.from({ length: 28 }, (_, i) => i + 1);
+    const FUEL_ICON = {
+      elec: '<svg class="icon" viewBox="0 0 18 18"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>',
+      gas: '<svg class="icon" viewBox="0 0 18 18"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>',
+    };
+    const GROUPS = [
+      ["fixed", "Fixed tariffs"],
+      ["variable", "Variable tariffs"],
+      ["smart", "Smart tariffs"],
+    ];
+    const JOURNEYS = {
+      change: {
+        title: "Change tariff",
+        steps: ["Choose tariff", "Review and confirm"],
+        list: ["fx1", "fx2", "vr1", "cur", "sm1"],
+        note: "Compare the tariffs available to you with your current one.",
+        options: "Other tariffs you can switch to",
+        summary: "Your new tariff",
+        submit: "Confirm tariff change",
+        successTitle: "Your tariff change is confirmed",
+        toast: "Tariff change confirmed",
+      },
+      renewal: {
+        title: "Renew your tariff",
+        steps: ["Choose tariff", "Review and confirm"],
+        list: ["fx1", "fx2", "fx3", "vr1"],
+        note: "Choose your next tariff by [date]. If you do nothing, you’ll move to our [standard variable tariff name].",
+        options: "Your renewal options",
+        summary: "Your renewal",
+        submit: "Confirm renewal",
+        successTitle: "Your renewal is confirmed",
+        toast: "Renewal confirmed",
+      },
+      dd: {
+        title: "Set up Direct Debit",
+        steps: ["Choose tariff", "Set up Direct Debit", "Review and confirm"],
+        list: ["fx1", "fx2", "vr1", "sm1"],
+        note: "To pay by Direct Debit, you’ll first change to a Direct Debit tariff.",
+        options: "Choose a Direct Debit tariff",
+        summary: "Your new tariff",
+        submit: "Confirm and switch",
+        successTitle: "You’re set up to pay by Direct Debit",
+        toast: "Direct Debit set up",
+      },
+    };
+    const STEP_OF = { pick: 0, confirm: 1, bank: 1, review: 2 };
+
+    let journey = params.get("journey");
+    if (!JOURNEYS[journey]) journey = JOURNEY_FOR[tariffScenario()];
+    if (SCENARIO_FOR[journey] && tariffScenario() !== SCENARIO_FOR[journey]) {
+      sessionStorage.setItem(TARIFF_KEY, SCENARIO_FOR[journey]);
+      sessionStorage.removeItem(TARIFF_OUTCOME_KEY);
+      paintTariffControls();
+    }
+
+    let state;
+    const heading = $("[data-tj-heading]", root);
+    const ordinal = (n) => `${n}${n % 10 === 1 && n !== 11 ? "st" : n % 10 === 2 && n !== 12 ? "nd" : n % 10 === 3 && n !== 13 ? "rd" : "th"}`;
+    const J = () => JOURNEYS[journey];
+    const outcome = () => (journey === "change" && tariffScenario() !== "change" ? "ok" : tariffOutcome());
+    const sel = () => TARIFFS[state.sel];
+    const fill = (key, text) => $$(`[data-out="${key}"]`, root).forEach((el) => (el.textContent = text));
+    const amountText = () => gbp((sel() ? sel().month : 0) + state.amount);
+
+    function fresh() {
+      const done = tariffDone();
+      const retry = journey === "dd" && TARIFFS[done.partial] ? done.partial : null;
+      return {
+        view: retry ? "bank" : "pick",
+        sel: retry,
+        retry: Boolean(retry),
+        prev: journey === "renewal" && TARIFFS[done.renewal] ? done.renewal : null,
+        gone: new Set(),
+        open: new Set(),
+        amount: 0,
+        day: null,
+        failed: false,
+        bankFailed: false,
+        busy: false,
+        dirty: false,
+      };
+    }
+
+    function rateRows(t, fuel) {
+      const rows = [["Standing charge", "per day"]];
+      if (fuel === "elec" && t.dayNight) rows.push(["Day rate", "per kWh"], ["Night rate", "per kWh"]);
+      else rows.push(["Unit rate", "per kWh"]);
+      return rows;
+    }
+
+    function rateCards(t, level = 3) {
+      return t.fuels
+        .map(
+          (fuel) => `
+          <article class="rate-card">
+            <h${level} class="rate-head"><span class="fuel-tile" aria-hidden="true">${FUEL_ICON[fuel]}</span>${fuel === "elec" ? "Electricity" : "Gas"}</h${level}>
+            <dl class="rate-list">
+              ${rateRows(t, fuel)
+                .map(([label, unit], i) => `<div><dt>${label}</dt><dd>${pence(t.rates[fuel][i])} <span>${unit}</span></dd></div>`)
+                .join("")}
+            </dl>
+          </article>`
+        )
+        .join("");
+    }
+
+    function rateMini(t, level = 5) {
+      const fuels = t.fuels
+        .map(
+          (fuel) => `
+          <section class="tj-mini-fuel">
+            <h${level}><span class="fuel-tile" aria-hidden="true">${FUEL_ICON[fuel]}</span>${fuel === "elec" ? "Electricity" : "Gas"}</h${level}>
+            <dl>
+              ${rateRows(t, fuel)
+                .map(([label, unit], i) => `<div><dt>${label}</dt><dd><b>${pence(t.rates[fuel][i])}</b> ${unit}</dd></div>`)
+                .join("")}
+            </dl>
+          </section>`
+        )
+        .join("");
+      return `<div class="tj-mini-rates">${fuels}</div>`;
+    }
+
+    function usageLine(t) {
+      return `<p class="tj-usage">Est. usage · Electricity 9,185 kWh a year${t.fuels.includes("gas") ? " · Gas 17,000 kWh a year" : ""}</p>`;
+    }
+
+    function facts(rows) {
+      return rows.map(([dt, dd]) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`).join("");
+    }
+
+    function tariffFacts(t, start) {
+      return facts([
+        ["Contract type", t.kind === "Smart" ? "Fixed" : t.kind],
+        ...(start ? [["Start date", start]] : []),
+        ["End date", t.end],
+        ["Exit fees", t.exit || "No exit fees"],
+        ["Payment method", "Direct Debit"],
+      ]);
+    }
+
+    function details(t, level = 3) {
+      return `
+        <dl class="tj-facts">${tariffFacts(t)}</dl>
+        <div class="rate-cards">${rateCards(t, level)}</div>
+        <p class="tj-usage">Est. usage · Electricity 9,185 kWh a year${t.fuels.includes("gas") ? " · Gas 17,000 kWh a year" : ""}</p>`;
+    }
+
+    function currentTariff() {
+      const fixed = journey === "renewal" && !state.moved;
+      return {
+        name: journey === "renewal" ? (fixed ? "[Current fixed tariff name]" : "[Standard variable tariff name]") : "Fair Variable Dual",
+        type: fixed ? "Fixed" : "Variable",
+        pay: journey === "dd" ? "Pay on bill" : "Direct Debit",
+        rows: fixed
+          ? [["Contract type", "Fixed"], ["Start date", "[start date]"], ["End date", "[end date]"], ["Exit fees", TARIFFS.curFixed.exit]]
+          : [["Contract type", "Variable"], ["Start date", journey === "renewal" ? "[end date]" : "24 June 2024"], ["End date", "No end date"], ["Exit fees", "No exit fees"]],
+      };
+    }
+
+    function cardCta(id, t) {
+      if (t.current) return `<span class="tj-card-state">Your current tariff</span>`;
+      if (id === state.prev) return `<span class="tj-card-state">Your renewal choice</span>`;
+      if (t.off || state.gone.has(id)) return `<span class="tj-card-state is-off">Not available right now</span>`;
+      const on = state.sel === id;
+      return `<button type="button" class="btn btn-primary tj-choose" data-tj-choose="${id}" aria-label="Choose ${t.name}">${on ? "✓ Selected" : "Choose this tariff"}</button>`;
+    }
+
+    function card(id) {
+      const t = TARIFFS[id];
+      const open = state.open.has(id);
+      const off = t.off || state.gone.has(id);
+      const cmp = t.current
+        ? ""
+        : `<span class="tj-compare ${t.cmp === "cheaper" ? "is-cheaper" : "is-more"}">£${t.diff} a year ${t.cmp === "cheaper" ? "cheaper" : "more"}</span>`;
+      const tick = '<svg class="icon" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2.5,7.5 5.5,10.5 11.5,3.5" /></svg>';
+      const points = [t.fuels.includes("gas") ? "Electricity and gas" : "Electricity only", t.term, "Pay by Direct Debit", t.exit ? `Exit fees of ${t.exit}` : "No exit fees"];
+      return `
+        <article class="tj-card${state.sel === id ? " is-selected" : ""}${off ? " is-off" : ""}${t.current ? " is-current" : ""}" aria-labelledby="tj-card-${id}">
+          <div class="tj-card-head">
+            <h4 id="tj-card-${id}">${t.name}</h4>
+            <div class="tj-tags">${t.best ? '<span class="tj-chip is-best">Best value</span>' : ""}<span class="tj-tag">${t.kind}</span></div>
+          </div>
+          <p class="tj-desc">${DESC}</p>
+          <div class="tj-cost">
+            <div class="tj-cost-main">
+              <span class="sr-only">Estimated cost</span>
+              <span><b>${gbp(t.month)}</b> a month</span>
+              <span class="tj-cost-year">${gbp(t.month * 12)} a year (estimate)</span>
+            </div>
+            ${cmp}
+          </div>
+          <ul class="tj-points">${points.map((p) => `<li>${tick}${p}</li>`).join("")}</ul>
+          <button type="button" class="link-btn tj-more-btn" data-tj-more="${id}" aria-expanded="${open}" aria-controls="tj-more-${id}">${open ? "Hide tariff rates" : "View tariff rates"}<svg class="icon tj-caret" viewBox="0 0 14 14" aria-hidden="true"><polyline points="2,5 7,10 12,5" /></svg></button>
+          <div class="tj-more" id="tj-more-${id}"${open ? "" : " hidden"}>${rateMini(t)}${usageLine(t)}</div>
+          <div class="tj-card-cta">${cardCta(id, t)}</div>
+        </article>`;
+    }
+
+    function paintPick() {
+      const J0 = J();
+      const out = outcome();
+      const blocked = (journey === "dd" && out === "inelig") || (journey === "renewal" && out === "noOptions");
+      $("[data-tj-pick-note]", root).textContent = J0.note;
+      const cur = currentTariff();
+      fill("cur-name", cur.name);
+      fill("cur-type", cur.type);
+      fill("cur-pay", cur.pay);
+      $("[data-tj-cur-facts]", root).innerHTML = facts(cur.rows);
+      const curRates = cur.type === "Fixed" ? TARIFFS.curFixed : TARIFFS.cur;
+      $("[data-tj-cur-more]", root).innerHTML = `<h3 class="tj-more-title">Tariff rates</h3>${rateMini(curRates, 4)}${usageLine(curRates)}`;
+      $("[data-tj-inelig]", root).hidden = !(journey === "dd" && out === "inelig");
+      $("[data-tj-no-options]", root).hidden = !(journey === "renewal" && out === "noOptions");
+      $("[data-tj-options]", root).hidden = blocked;
+      $("[data-tj-options-title]", root).textContent = J0.options;
+      $("[data-tj-default]", root).hidden = journey !== "renewal";
+      $("[data-tj-groups]", root).innerHTML = GROUPS.map(([group, label]) => {
+        const ids = J0.list.filter((id) => TARIFFS[id].group === group);
+        if (!ids.length) return "";
+        return `<section class="tj-group" aria-labelledby="tj-group-${group}"><h3 id="tj-group-${group}">${label}</h3><div class="tj-cards">${ids.map(card).join("")}</div></section>`;
+      }).join("");
+    }
+
+    function paintConfirm() {
+      const t = sel();
+      const out = outcome();
+      const unavailable = journey === "change" && out === "unavailable" && state.gone.has(state.sel);
+      root.classList.toggle("is-unavailable", unavailable);
+      $("[data-tj-unavailable]", root).hidden = !unavailable;
+      $("[data-tj-changing]", root).hidden = !(journey === "renewal" && state.prev && state.prev !== state.sel);
+      $("[data-tj-moved]", root).hidden = !state.moved;
+      $("[data-tj-moved-note]", root).hidden = !state.moved;
+      $("[data-tj-renewal-only]", root).hidden = journey !== "renewal";
+      $("[data-tj-summary-label]", root).textContent = J().summary;
+      fill("prev-name", state.prev ? TARIFFS[state.prev].name : "");
+      fill("sel-kind", t.kind);
+      $("[data-tj-sel-facts]", root).innerHTML = tariffFacts(t, "[date]");
+      $("[data-tj-rates]", root).innerHTML = rateCards(t);
+      $('[data-tj-submit="confirm"]', root).textContent = J().submit;
+    }
+
+    function paintBank() {
+      $("[data-tj-retry]", root).hidden = !state.retry;
+      $("[data-tj-change-tariff]", root).hidden = state.retry;
+      fill("amount", amountText());
+      const amountInput = $("[data-tj-amount-input]", root);
+      if (document.activeElement !== amountInput) amountInput.value = (sel().month + state.amount).toFixed(2);
+      $("[data-tj-recommended]", root).hidden = state.amount !== 0;
+      $("[data-tj-below]", root).hidden = state.amount >= 0;
+      const daySelect = $("[data-tj-day-select]", root);
+      if (!daySelect.options.length) {
+        daySelect.innerHTML = `<option value="">Choose a date</option>${DAYS.map((day) => `<option value="${day}">${ordinal(day)} of the month</option>`).join("")}`;
+      }
+      daySelect.value = state.day ? String(state.day) : "";
+      $("[data-tj-day-summary]", root).hidden = !state.day;
+      fill("day", state.day ? ordinal(state.day) : "");
+    }
+
+    function field(name) {
+      return $(`[data-tj-field="${name}"]`, root);
+    }
+
+    function paintReview() {
+      const t = sel();
+      const acct = field("acct").value;
+      const rows = [
+        ["Current tariff", "Fair Variable Dual (Pay on bill)", '<span class="tj-tag is-leave">Leaving</span>', ""],
+        ["New tariff", t.name, '<span class="tj-tag is-join">Joining</span><button type="button" class="link-btn" data-tj-details="selected">View tariff details</button>', state.retry ? "" : "pick"],
+        ["Direct Debit amount", amountText(), '<button type="button" class="link-btn" data-tj-review-open>Your Direct Debit may be reviewed</button>', "bank"],
+        ["Payment date", `${ordinal(state.day)} of every month`, "", "bank"],
+        ["Bank details", `${field("first").value.trim()} ${field("last").value.trim()}`, `<span>Account ending •••• ${acct.slice(-4)}</span>`, "bank"],
+      ];
+      $("[data-tj-review]", root).innerHTML = rows
+        .map(
+          ([dt, value, extra, edit]) => `
+          <div>
+            <dt>${dt}</dt>
+            <dd><b>${value}</b>${extra ? `<span class="tj-review-extra">${extra}</span>` : ""}</dd>
+            ${edit ? `<button type="button" class="link-btn tj-edit" data-tj-go="${edit}" aria-label="Edit ${dt.toLowerCase()}">Edit</button>` : ""}
+          </div>`
+        )
+        .join("");
+    }
+
+    function paintOutcome(view) {
+      const t = sel();
+      const dd = journey === "dd";
+      if (view === "success") {
+        fill("success-title", J().successTitle);
+        fill("success-text", dd ? `${t.name} starts on [date]. Your first payment of ${amountText()} is on or around [date].` : `${t.name} starts on [date].`);
+        const steps = dd
+          ? ["We’ll send a confirmation email within 24 hours.", "[Advance notice of first collection – Billing to confirm]", "Your payment method on Your tariff will show Direct Debit."]
+          : ["We’ll send a confirmation email within 24 hours.", "Your new rates apply from [date]."];
+        $("[data-tj-next-steps]", root).innerHTML = steps.map((s) => `<li>${s}</li>`).join("");
+      }
+      if (view === "error") {
+        fill("error-title", dd ? "We couldn’t set up your Direct Debit" : "Something went wrong");
+        fill(
+          "error-text",
+          dd
+            ? "Something went wrong on our side. We’ve kept your details, apart from your account number. Please try again or contact us if this keeps happening."
+            : "We couldn’t update your tariff right now. Please try again or contact us if this keeps happening."
+        );
+      }
+    }
+
+    function paintAgree(view) {
+      const section = $(`[data-tj-view="${view}"]`, root);
+      const t = sel();
+      const exitRow = $("[data-tj-exit-row]", section);
+      exitRow.hidden = !t || !t.exit;
+      const agree = $("[data-tj-agree]", section).checked;
+      const exit = exitRow.hidden || $("[data-tj-exit]", section).checked;
+      const submit = $("[data-tj-submit]", section);
+      submit.disabled = state.busy || !(agree && exit);
+      if (state.busy) submit.textContent = "Confirming…";
+      else submit.textContent = view === "confirm" ? J().submit : "Confirm and switch";
+    }
+
+    function paintSteps() {
+      const steps = J().steps;
+      const idx = STEP_OF[state.view];
+      const box = $("[data-tj-steps]", root);
+      box.hidden = idx === undefined || journey === "change" || (journey !== "dd" && state.view === "bank");
+      if (box.hidden) return;
+      $("[data-tj-step]", root).textContent = `Step ${idx + 1} of ${steps.length}: ${steps[idx]}`;
+      const bar = $("[data-tj-progress]", root);
+      bar.setAttribute("aria-valuemax", String(steps.length));
+      bar.setAttribute("aria-valuenow", String(idx + 1));
+      bar.setAttribute("aria-valuetext", `Step ${idx + 1} of ${steps.length}`);
+      bar.style.setProperty("--steps", steps.length);
+      bar.innerHTML = steps.map((_, i) => `<span${i <= idx ? ' class="is-on"' : ""}></span>`).join("");
+    }
+
+    function lockAddress(locked) {
+      $$("[data-address-open]").forEach((btn) => {
+        btn.disabled = locked;
+        if (locked) btn.title = "Finish or cancel this change to switch address";
+        else btn.removeAttribute("title");
+      });
+    }
+
+    function show(view, focus = true) {
+      state.view = view;
+      $$("[data-tj-view]", root).forEach((section) => {
+        section.hidden = section.dataset.tjView !== view;
+      });
+      const title = J().title;
+      $("[data-tj-title]", root).textContent = title;
+      $("[data-tj-crumb]", root).textContent = title;
+      document.title = `${title} · Home Energy`;
+      if (sel()) {
+        fill("sel-month", gbp(sel().month));
+        fill("sel-year", gbp(sel().month * 12));
+        fill("exit-fee", sel().exitFee || "");
+        fill("min-amount", gbp(sel().month));
+      }
+      if (view === "pick") paintPick();
+      if (view === "confirm") paintConfirm();
+      if (view === "bank") paintBank();
+      if (view === "review") paintReview();
+      if (view === "success" || view === "error") paintOutcome(view);
+      if (view === "confirm" || view === "review") paintAgree(view);
+      paintSteps();
+      const finished = view === "success" || view === "partial";
+      $$("[data-tj-leave]", root).forEach((el) => {
+        if (el.matches("button")) el.hidden = finished;
+      });
+      lockAddress(!finished && view !== "error");
+      if (focus) {
+        heading.focus({ preventScroll: true });
+        window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+      }
+    }
+
+    function start() {
+      state = fresh();
+      $$("[data-tj-agree], [data-tj-exit], [data-tj-holder]", root).forEach((box) => (box.checked = false));
+      $$("[data-tj-field]", root).forEach((input) => {
+        input.value = "";
+        input.removeAttribute("aria-invalid");
+      });
+      $$("[data-tj-hint]", root).forEach((hint) => (hint.textContent = ""));
+      $$("[data-tj-day-error], [data-tj-holder-error], [data-tj-bank-error]", root).forEach((el) => (el.hidden = true));
+      $("[data-tj-paper]", root).hidden = false;
+      fill("sel-name", state.sel ? sel().name : "");
+      show(state.view, false);
+    }
+
+    function leave() {
+      if (state.dirty && !["success", "partial"].includes(state.view)) {
+        $("[data-tj-leave-modal]", root).showModal();
+        return;
+      }
+      location.href = exitUrl;
+    }
+
+    function finish() {
+      sessionStorage.setItem(TOAST_KEY, state.view === "partial" ? JOURNEYS.change.toast : J().toast);
+      location.href = params.get("from") === "account" ? "account.html" : "tariff.html";
+    }
+
+    function openDrawer() {
+      $("[data-tj-drawer-title]", root).textContent = sel().name;
+      $("[data-tj-drawer-body]", root).innerHTML = details(sel());
+      $("[data-tj-drawer]", root).showModal();
+    }
+
+    function toggleDisclosure(btn) {
+      const open = btn.getAttribute("aria-expanded") !== "true";
+      btn.setAttribute("aria-expanded", String(open));
+      document.getElementById(btn.getAttribute("aria-controls")).hidden = !open;
+      const label = $("[data-tj-toggle-label]", btn);
+      if (label) label.textContent = open ? "Hide tariff details" : "View tariff details";
+    }
+
+    function submit(view) {
+      const out = outcome();
+      state.busy = true;
+      paintAgree(view);
+      setTimeout(() => {
+        state.busy = false;
+        if (journey === "change" && out === "unavailable" && !state.gone.size) {
+          state.gone.add(state.sel);
+          paintAgree(view);
+          paintConfirm();
+          heading.focus({ preventScroll: true });
+          window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
+          return;
+        }
+        if (journey === "renewal" && out === "closed") {
+          setTariffDone({ closed: true });
+          location.href = "tariff.html";
+          return;
+        }
+        if (out === "fail" && !state.failed) {
+          state.failed = true;
+          show("error");
+          return;
+        }
+        if (journey === "dd" && out === "partial" && !state.retry) {
+          setTariffDone({ partial: state.sel });
+          state.retry = true;
+          show("partial");
+          return;
+        }
+        if (journey === "change") setTariffDone({ change: state.sel });
+        if (journey === "renewal") setTariffDone({ renewal: state.sel, closed: false });
+        if (journey === "dd") setTariffDone({ dd: state.sel, partial: null });
+        show("success");
+      }, 1200);
+    }
+
+    function validateBank() {
+      const checks = {
+        first: (v) => (v.trim() ? "" : "Enter the account holder’s first name"),
+        last: (v) => (v.trim() ? "" : "Enter the account holder’s last name"),
+        acct: (v) => (/^\d{8}$/.test(v) ? "" : "Account number must be 8 digits"),
+        sort: (v) => (/^\d{2}-\d{2}-\d{2}$/.test(v) ? "" : "Enter a valid sort code, like 00-00-00"),
+      };
+      let firstBad = null;
+      Object.entries(checks).forEach(([name, check]) => {
+        const input = field(name);
+        const message = check(input.value);
+        $(`[data-tj-hint="${name}"]`, root).textContent = message;
+        if (message) input.setAttribute("aria-invalid", "true");
+        else input.removeAttribute("aria-invalid");
+        if (message && !firstBad) firstBad = input;
+      });
+      const dayError = $("[data-tj-day-error]", root);
+      dayError.hidden = Boolean(state.day);
+      const daySelect = $("[data-tj-day-select]", root);
+      if (state.day) daySelect.removeAttribute("aria-invalid");
+      else daySelect.setAttribute("aria-invalid", "true");
+      const holder = $("[data-tj-holder]", root).checked;
+      $("[data-tj-holder-error]", root).hidden = holder;
+      if (!state.day) {
+        daySelect.focus();
+        return false;
+      }
+      if (firstBad) {
+        firstBad.focus();
+        return false;
+      }
+      if (!holder) {
+        $("[data-tj-holder]", root).focus();
+        return false;
+      }
+      return true;
+    }
+
+    root.addEventListener("click", (e) => {
+      const choose = e.target.closest("[data-tj-choose]");
+      if (choose) {
+        state.sel = choose.dataset.tjChoose;
+        state.dirty = true;
+        fill("sel-name", sel().name);
+        if (journey === "renewal" && outcome() === "moved") state.moved = true;
+        show(journey === "dd" ? "bank" : "confirm");
+        return;
+      }
+      const more = e.target.closest("[data-tj-more]");
+      if (more) {
+        const id = more.dataset.tjMore;
+        if (state.open.has(id)) state.open.delete(id);
+        else state.open.add(id);
+        paintPick();
+        $(`[data-tj-more="${id}"]`, root).focus();
+        return;
+      }
+      const go = e.target.closest("[data-tj-go]");
+      if (go) {
+        if (go.dataset.tjGo === "pick") root.classList.remove("is-unavailable");
+        show(go.dataset.tjGo);
+        return;
+      }
+      if (e.target.closest("[data-tj-back], [data-tj-leave]")) {
+        e.preventDefault();
+        leave();
+        return;
+      }
+      if (e.target.closest("[data-tj-bank-back]")) {
+        if (state.retry) leave();
+        else show("pick");
+        return;
+      }
+      const amount = e.target.closest("[data-tj-amount]");
+      if (amount) {
+        const total = Math.max(5, sel().month + state.amount + Number(amount.dataset.tjAmount));
+        state.amount = Math.round((total - sel().month) * 100) / 100;
+        state.dirty = true;
+        paintBank();
+        return;
+      }
+      if (e.target.closest("[data-tj-bank-next]")) {
+        if (!validateBank()) return;
+        const bankError = $("[data-tj-bank-error]", root);
+        if (outcome() === "bankFail" && !state.bankFailed) {
+          state.bankFailed = true;
+          bankError.hidden = false;
+          bankError.setAttribute("tabindex", "-1");
+          bankError.focus();
+          return;
+        }
+        bankError.hidden = true;
+        show("review");
+        return;
+      }
+      const submitBtn = e.target.closest("[data-tj-submit]");
+      if (submitBtn && !submitBtn.disabled) {
+        submit(submitBtn.dataset.tjSubmit);
+        return;
+      }
+      if (e.target.closest("[data-tj-try-again]")) {
+        if (journey === "dd") {
+          field("acct").value = "";
+          show("bank");
+        } else {
+          show("confirm");
+          submit("confirm");
+        }
+        return;
+      }
+      if (e.target.closest("[data-tj-retry-dd]")) {
+        field("acct").value = "";
+        show("bank");
+        return;
+      }
+      if (e.target.closest("[data-tj-finish]")) {
+        finish();
+        return;
+      }
+      if (e.target.closest("[data-tj-details]")) {
+        openDrawer();
+        return;
+      }
+      const toggle = e.target.closest("[data-tj-toggle]");
+      if (toggle) {
+        toggleDisclosure(toggle);
+        return;
+      }
+      if (e.target.closest("[data-tj-review-open]")) {
+        $("[data-tj-review-modal]", root).showModal();
+        return;
+      }
+      if (e.target.closest("[data-tj-review-close]")) {
+        $("[data-tj-review-modal]", root).close();
+        return;
+      }
+      if (e.target.closest("[data-tj-drawer-close]")) {
+        $("[data-tj-drawer]", root).close();
+        return;
+      }
+      if (e.target.closest("[data-tj-paper-close]")) {
+        $("[data-tj-paper]", root).hidden = true;
+        $('[data-tj-view="review"] [data-tj-agree]', root).focus();
+        return;
+      }
+      if (e.target.closest("[data-tj-leave-confirm]")) {
+        location.href = exitUrl;
+        return;
+      }
+      if (e.target.closest("[data-tj-leave-cancel]")) {
+        $("[data-tj-leave-modal]", root).close();
+      }
+    });
+
+    root.addEventListener("change", (e) => {
+      if (e.target.matches("[data-tj-agree], [data-tj-exit]")) {
+        state.dirty = true;
+        paintAgree(e.target.closest("[data-tj-view]").dataset.tjView);
+      }
+      if (e.target.matches("[data-tj-holder]")) {
+        state.dirty = true;
+        $("[data-tj-holder-error]", root).hidden = true;
+      }
+      if (e.target.matches("[data-tj-day-select]")) {
+        state.day = Number(e.target.value) || null;
+        state.dirty = true;
+        $("[data-tj-day-error]", root).hidden = Boolean(state.day);
+        if (state.day) e.target.removeAttribute("aria-invalid");
+        paintBank();
+      }
+      if (e.target.matches("[data-tj-amount-input]")) {
+        e.target.value = (sel().month + state.amount).toFixed(2);
+      }
+    });
+
+    root.addEventListener("input", (e) => {
+      if (e.target.matches("[data-tj-amount-input]")) {
+        const cleaned = e.target.value.replace(/[^\d.]/g, "").replace(/(\..*)\./g, "$1");
+        if (cleaned !== e.target.value) e.target.value = cleaned;
+        const typed = Number.parseFloat(cleaned);
+        if (Number.isFinite(typed) && typed >= 5) {
+          state.amount = Math.round((Math.min(typed, 2000) - sel().month) * 100) / 100;
+          state.dirty = true;
+          paintBank();
+        }
+        return;
+      }
+      const input = e.target.closest("[data-tj-field]");
+      if (!input) return;
+      state.dirty = true;
+      if (input.dataset.tjField === "acct") input.value = input.value.replace(/\D/g, "").slice(0, 8);
+      if (input.dataset.tjField === "sort") {
+        const digits = input.value.replace(/\D/g, "").slice(0, 6);
+        input.value = digits.match(/.{1,2}/g)?.join("-") || "";
+      }
+    });
+
+    $$(".tj-drawer", root).forEach((dialog) =>
+      dialog.addEventListener("click", (e) => {
+        if (e.target === dialog) dialog.close();
+      })
+    );
+
+    onTariffChange(() => {
+      journey = JOURNEY_FOR[tariffScenario()];
+      const url = new URL(location.href);
+      url.searchParams.set("journey", journey);
+      history.replaceState(null, "", url);
+      start();
+    });
+
+    start();
+  }
+
   function initPrototype() {
     const params = new URLSearchParams(location.search);
     if (CUSTOMERS[params.get("customer")]) sessionStorage.setItem(CUSTOMER_KEY, params.get("customer"));
@@ -2084,6 +3014,20 @@
     const toggle = $("[data-proto-toggle]");
     const menu = $(".proto-menu");
     if (!panel || !toggle || !menu) return;
+    const tariffControls = document.createElement("div");
+    tariffControls.className = "proto-group";
+    tariffControls.innerHTML = `
+      <p class="proto-note">Tariff journey</p>
+      <div class="proto-choices" role="radiogroup" aria-label="Tariff journey">
+        ${Object.entries(TARIFF_SCENARIOS)
+          .map(([value, label]) => `<button type="button" role="radio" data-tariff-scenario="${value}" aria-checked="false">${label}</button>`)
+          .join("")}
+      </div>
+      <p class="proto-note" data-tariff-scenario-note></p>
+      <p class="proto-note">Tariff outcome</p>
+      <div class="proto-choices" role="radiogroup" aria-label="Tariff outcome" data-tariff-outcomes></div>
+      <button type="button" class="link-btn" data-tariff-reset>Reset tariff journeys</button>`;
+    panel.append(tariffControls);
     function setOpen(open) {
       panel.hidden = !open;
       toggle.setAttribute("aria-expanded", String(open));
@@ -2098,12 +3042,28 @@
         setCustomer(choice.dataset.customer);
         return;
       }
+      const scenario = e.target.closest("[data-tariff-scenario]");
+      if (scenario) {
+        if (scenario.dataset.tariffScenario !== tariffScenario()) changeTariffPrototype(scenario.dataset.tariffScenario);
+        return;
+      }
+      const outcome = e.target.closest("[data-tariff-outcome]");
+      if (outcome) {
+        if (outcome.dataset.tariffOutcome !== tariffOutcome()) changeTariffPrototype(tariffScenario(), outcome.dataset.tariffOutcome);
+        return;
+      }
+      if (e.target.closest("[data-tariff-reset]")) {
+        changeTariffPrototype(tariffScenario(), tariffOutcome());
+        toast("Tariff journeys reset");
+        return;
+      }
       if (!menu.contains(e.target)) setOpen(false);
     });
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") setOpen(false);
     });
     paintCustomer();
+    paintTariffControls();
   }
 
   function initPortal() {
@@ -2121,17 +3081,711 @@
     initTips();
     initCopy();
     initPrototype();
+    initTariffJourney();
+    initHomeTariff();
+    const pendingToast = sessionStorage.getItem(TOAST_KEY);
+    if (pendingToast) {
+      sessionStorage.removeItem(TOAST_KEY);
+      setTimeout(() => toast(pendingToast), 300);
+    }
     initReadings();
     initBooking();
     initTariff();
     initBills();
     initMovingOut();
+    initAccount();
     $$("[data-sign-out]").forEach((btn) =>
       btn.addEventListener("click", () => {
         session.end();
         location.href = "index.html";
       })
     );
+  }
+
+  /* ---------- Your account ---------- */
+
+  const ACCOUNT_KEY = "he-account-v2";
+  const PSR_NEEDS = [
+    "Age-related support",
+    "Hearing loss",
+    "Visual impairment",
+    "Chronic illness",
+    "Extra heating needs",
+    "Mobility needs",
+    "Medical equipment that needs power",
+    "[Other needs – PSR team to confirm]",
+  ];
+  const READING_FREQ = { half: "Half-hourly", daily: "Daily", monthly: "Monthly" };
+  const ACCOUNT_PAGES = ["login", "contact", "billing", "dd", "psr", "marketing", "smart", "support", "contactus", "faqs"];
+  const accountDefaults = () => ({
+    contact: { name: "Keith Bastian", email: "keith.bastian@gmail.com", mobile: "07700 900123", tel: "020 7123 4567" },
+    username: "keith.bastian@gmail.com",
+    mkt: { email: true, phone: false, sms: true },
+    freq: "daily",
+    dd: { set: null, holder: "Keith Bastian", last4: "4321", sortEnd: "21", day: 1 },
+    psr: { reg: true, date: "12 January 2025", needs: ["Age-related support", "Hearing loss", "Extra heating needs"] },
+    fail: false,
+  });
+  const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
+  const phoneDigits = (v) => v.replace(/[\s()-]/g, "");
+  const ACCOUNT_CHECKS = {
+    name: (v) => Boolean(v.trim()),
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+    mobile: (v) => /^(07\d{9}|\+447\d{9})$/.test(phoneDigits(v)),
+    tel: (v) => !v.trim() || /^(0\d{9,10}|\+44\d{9,10})$/.test(phoneDigits(v)),
+  };
+
+  function initAccount() {
+    const root = $("[data-acct]");
+    if (!root) return;
+    let state;
+    try {
+      state = { ...accountDefaults(), ...JSON.parse(sessionStorage.getItem(ACCOUNT_KEY)) };
+    } catch {
+      state = accountDefaults();
+    }
+    const save = () => sessionStorage.setItem(ACCOUNT_KEY, JSON.stringify(state));
+    const mobile = matchMedia("(max-width: 720px)");
+    const dialog = $("[data-acct-modal]", root);
+    const modalBody = $("[data-acct-modal-body]", root);
+    const modalSubmit = $("[data-acct-modal-submit]", root);
+    let editing = null;
+    let draft = {};
+    let touched = {};
+    let busy = null;
+    let error = null;
+    let modal = null;
+    let md = {};
+    let mt = {};
+    let mstep = 1;
+    let opener = null;
+    let lastPage = "menu";
+
+    const isSmart = () => customer() !== "trad";
+    const ddSet = () => state.dd.set ?? (tariffScenario() !== "pob" || Boolean(tariffDone().dd));
+    const needsTariffChange = () => tariffScenario() === "pob" && !tariffDone().dd;
+    const later = (ms, fn) => setTimeout(fn, ms);
+
+    function setBusy(btn, on) {
+      const spin = $(".acct-spin", btn);
+      if (on && !spin) btn.insertAdjacentHTML("afterbegin", '<span class="acct-spin" aria-hidden="true"></span>');
+      if (!on && spin) spin.remove();
+      btn.toggleAttribute("aria-busy", on);
+    }
+
+    /* Pages on mobile */
+
+    function page() {
+      const id = location.hash.slice(1);
+      if (!mobile.matches || !ACCOUNT_PAGES.includes(id)) return "menu";
+      return id === "smart" && !isSmart() ? "menu" : id;
+    }
+
+    function paintPage() {
+      const current = page();
+      root.dataset.acctPage = current;
+      $("[data-acct-back]", root).hidden = current === "menu";
+      $$("[data-acct-card]", root).forEach((card) => card.classList.toggle("is-current", card.dataset.acctCard === current));
+      if (current === lastPage) return;
+      if (editing) cancelEdit();
+      window.scrollTo(0, 0);
+      if (current === "menu") {
+        const row = $(`.acct-row[href="#${lastPage}"]`, root);
+        if (row) row.focus();
+      } else {
+        const heading = $(`[data-acct-card="${current}"] h2`, root);
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
+      lastPage = current;
+    }
+
+    function goBack() {
+      if (history.state && history.state.acct) {
+        history.back();
+        return;
+      }
+      history.replaceState(null, "", location.pathname + location.search);
+      paintPage();
+    }
+
+    /* Cards */
+
+    function paintValues() {
+      $$("[data-acct-value]", root).forEach((el) => (el.textContent = state.contact[el.dataset.acctValue] || "Not provided"));
+      $("[data-acct-username]", root).textContent = state.username;
+      $("[data-acct-freq]", root).textContent = READING_FREQ[state.freq];
+      $$("[data-acct-smart-only]", root).forEach((el) => (el.hidden = !isSmart()));
+    }
+
+    function paintPrefs() {
+      const prefs = editing === "marketing" ? draft : state.mkt;
+      $$("[data-acct-pref]", root).forEach((btn) => {
+        btn.setAttribute("aria-checked", String(Boolean(prefs[btn.dataset.acctPref])));
+        btn.setAttribute("aria-disabled", String(editing !== "marketing"));
+      });
+      const count = Object.values(prefs).filter(Boolean).length;
+      $("[data-acct-optin]", root).textContent = `${count} of 3 opted in`;
+      $("[data-acct-mkt-none]", root).hidden = !(editing === "marketing" && count === 0);
+    }
+
+    function paintDd() {
+      const set = ddSet();
+      $$("[data-acct-dd]", root).forEach((el) => (el.hidden = el.dataset.acctDd !== (set ? "set" : "none")));
+      $("[data-acct-dd-journey]", root).hidden = !needsTariffChange();
+      $("[data-acct-dd-modal]", root).hidden = needsTariffChange();
+      const values = { ...state.dd, day: `${ordinal(state.dd.day)} of each month` };
+      $$("[data-acct-dd-value]", root).forEach((el) => (el.textContent = values[el.dataset.acctDdValue]));
+    }
+
+    function paintPsr() {
+      const reg = state.psr.reg ? "yes" : "no";
+      $$("[data-acct-psr]", root).forEach((el) => (el.hidden = el.dataset.acctPsr !== reg));
+      $("[data-acct-psr-date]", root).textContent = state.psr.date;
+      $("[data-acct-needs]", root).innerHTML = state.psr.needs.map((need) => `<li>${need}</li>`).join("");
+    }
+
+    function paintAll() {
+      paintValues();
+      paintPrefs();
+      paintDd();
+      paintPsr();
+      paintProto();
+      paintPage();
+    }
+
+    /* Inline editing: contact, marketing, smart */
+
+    function editValid() {
+      if (editing === "contact") {
+        const changed = Object.keys(ACCOUNT_CHECKS).some((k) => draft[k] !== state.contact[k]);
+        return changed && Object.entries(ACCOUNT_CHECKS).every(([k, check]) => check(draft[k]));
+      }
+      if (editing === "marketing") {
+        const changed = Object.keys(state.mkt).some((k) => draft[k] !== state.mkt[k]);
+        return changed && Object.values(draft).some(Boolean);
+      }
+      if (editing === "smart") return draft.freq !== state.freq;
+      return false;
+    }
+
+    function paintContactErrors() {
+      Object.entries(ACCOUNT_CHECKS).forEach(([k, check]) => {
+        const bad = editing === "contact" && touched[k] && !check(draft[k]);
+        const input = $(`[data-acct-input="${k}"]`, root);
+        if (bad) input.setAttribute("aria-invalid", "true");
+        else input.removeAttribute("aria-invalid");
+        $(`[data-acct-err="${k}"]`, root).hidden = !bad;
+      });
+    }
+
+    function paintEdit() {
+      ["contact", "marketing", "smart"].forEach((k) => {
+        const on = editing === k;
+        $$(`[data-acct-view="${k}"]`, root).forEach((el) => (el.hidden = on));
+        $$(`[data-acct-form="${k}"]`, root).forEach((el) => (el.hidden = !on));
+        $(`[data-acct-error="${k}"]`, root).hidden = error !== k;
+        const btn = $(`[data-acct-save="${k}"]`, root);
+        btn.setAttribute("aria-disabled", String(!(on && editValid()) || Boolean(busy)));
+        setBusy(btn, busy === k);
+      });
+      paintContactErrors();
+      paintPrefs();
+    }
+
+    function startEdit(k) {
+      editing = k;
+      draft = k === "contact" ? { ...state.contact } : k === "marketing" ? { ...state.mkt } : { freq: state.freq };
+      touched = {};
+      error = null;
+      if (k === "contact") $$("[data-acct-input]", root).forEach((input) => (input.value = draft[input.dataset.acctInput]));
+      if (k === "smart") $(`input[name="acct-freq"][value="${draft.freq}"]`, root).checked = true;
+      paintEdit();
+      const first = { contact: "[data-acct-input]", marketing: "[data-acct-pref]", smart: 'input[name="acct-freq"]:checked' }[k];
+      $(`[data-acct-card="${k}"] ${first}`, root).focus();
+    }
+
+    function cancelEdit() {
+      const k = editing;
+      editing = null;
+      draft = {};
+      error = null;
+      paintEdit();
+      const edit = k && $(`[data-acct-edit="${k}"]`, root);
+      if (edit && !edit.closest("[hidden]")) edit.focus();
+    }
+
+    function saveEdit() {
+      const k = editing;
+      if (busy || !k) return;
+      if (!editValid()) {
+        if (k !== "contact") return;
+        Object.keys(ACCOUNT_CHECKS).forEach((name) => (touched[name] = true));
+        paintContactErrors();
+        const bad = $('[data-acct-input][aria-invalid="true"]', root);
+        if (bad) bad.focus();
+        return;
+      }
+      busy = k;
+      error = null;
+      paintEdit();
+      later(1000, () => {
+        busy = null;
+        if (state.fail) {
+          error = k;
+          paintEdit();
+          return;
+        }
+        if (k === "contact") state.contact = { ...draft };
+        if (k === "marketing") state.mkt = { ...draft };
+        if (k === "smart") state.freq = draft.freq;
+        save();
+        editing = null;
+        draft = {};
+        paintValues();
+        paintEdit();
+        $(`[data-acct-edit="${k}"]`, root).focus();
+        toast(k === "contact" ? "Your details have been updated" : "Your preferences have been updated");
+      });
+    }
+
+    /* Pop-ups: username, password, bank, PSR */
+
+    const field = (label, key, attrs = "", errorText = "") => `
+      <label class="acct-field">${label}
+        <input data-m="${key}" ${attrs} ${errorText ? `aria-describedby="acct-m-err-${key}"` : ""} />
+        ${errorText ? `<span class="acct-field-error" id="acct-m-err-${key}" data-m-err="${key}" hidden>${errorText}</span>` : ""}
+      </label>`;
+
+    function modalInfo() {
+      const masked = state.username.replace(/^(.).*(@.*)$/, "$1••••$2");
+      return {
+        username:
+          mstep === 1
+            ? { title: "Change username", sub: "Your username is the email address you use to log in.", btn: "Send code" }
+            : { title: "Check your email", sub: `We’ve sent a 6-digit code to ${masked}. Enter it to confirm your new username.`, btn: "Verify and save" },
+        password: { title: "Change password", sub: "", btn: "Save changes" },
+        bank: ddSet()
+          ? { title: "Change bank details", sub: "We’ll use these details for your next payment.", btn: "Save changes" }
+          : { title: "Set up Direct Debit", sub: "Pay automatically each month.", btn: "Set up Direct Debit" },
+        psr: state.psr.reg
+          ? { title: "Update PSR details", sub: "Choose the support your household needs.", btn: "Save changes" }
+          : { title: "Join the Priority Services Register", sub: "Choose the support your household needs.", btn: "Join the register" },
+        psrRemove: { title: "Remove your registration?", sub: "", btn: "Remove registration" },
+      }[modal];
+    }
+
+    function modalBodyHtml() {
+      if (modal === "username" && mstep === 1)
+        return (
+          field("New username (email)", "u", 'type="email" autocomplete="email" spellcheck="false"', "Enter an email address, like name@example.com") +
+          field("Confirm new username", "c", 'type="email" autocomplete="off" spellcheck="false"', "Usernames don’t match")
+        );
+      if (modal === "username")
+        return `
+          <label class="acct-field">6-digit code
+            <input class="acct-code" data-m="code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6" />
+          </label>
+          <button type="button" class="link-btn acct-resend" data-acct-resend>Send a new code</button>`;
+      if (modal === "password")
+        return `
+          ${field("Current password", "cur", 'type="password" autocomplete="current-password"')}
+          ${field("New password", "nw", 'type="password" autocomplete="new-password" aria-describedby="acct-pw-rules"')}
+          <ul class="acct-rules" id="acct-pw-rules" data-acct-rules></ul>
+          ${field("Confirm new password", "cf", 'type="password" autocomplete="new-password"', "Passwords don’t match")}
+          <label class="acct-check"><input type="checkbox" data-m-check="show" />Show passwords</label>`;
+      if (modal === "bank")
+        return `
+          ${field("Account holder name", "holder", 'autocomplete="off"', "Enter the account holder’s name")}
+          <div class="acct-pair">
+            ${field("Account number", "acct", 'inputmode="numeric" autocomplete="off" placeholder="8 digits"', "Must be 8 digits")}
+            ${field("Sort code", "sort", 'inputmode="numeric" autocomplete="off" placeholder="00-00-00"', "Use the format 00-00-00")}
+          </div>
+          ${
+            ddSet()
+              ? ""
+              : `<label class="acct-field">Payment date
+                  <span class="tj-select"><select data-m="day">${Array.from({ length: 28 }, (_, i) => `<option value="${i + 1}">${ordinal(i + 1)} of each month</option>`).join("")}</select></span>
+                </label>`
+          }
+          <label class="acct-check is-top"><input type="checkbox" data-m-check="auth" /><span>I’m the account holder and I authorise Home Energy to collect payments from this account by Direct Debit.</span></label>
+          <p class="acct-foot">Your payments are protected by the <a href="#" data-demo="Direct Debit Guarantee">Direct Debit Guarantee</a>.</p>`;
+      if (modal === "psr")
+        return `
+          <fieldset class="acct-needs-pick">
+            <legend class="sr-only">Support needs</legend>
+            ${PSR_NEEDS.map((need, i) => `<label class="acct-need"><input type="checkbox" data-m-need="${i}" />${need}</label>`).join("")}
+          </fieldset>
+          <p class="acct-error" role="alert" data-acct-psr-none hidden>Choose at least one support need.</p>`;
+      return `<p class="acct-copy-text">You’ll stop getting extra help, like advance notice of planned power cuts. You can join again at any time.</p>`;
+    }
+
+    function modalValid() {
+      switch (modal) {
+        case "username":
+          return mstep === 1
+            ? ACCOUNT_CHECKS.email(md.u) && md.u.trim() === md.c.trim() && md.u.trim() !== state.username
+            : /^\d{6}$/.test(md.code);
+        case "password":
+          return Boolean(md.cur) && md.nw.length >= 8 && /\d/.test(md.nw) && /[A-Z]/.test(md.nw) && md.nw === md.cf && md.nw !== md.cur;
+        case "bank":
+          return Boolean(md.holder.trim()) && /^\d{8}$/.test(md.acct) && /^\d{2}-\d{2}-\d{2}$/.test(md.sort) && md.auth;
+        case "psr": {
+          const now = [...md.needs].sort().join("|");
+          const was = state.psr.reg ? [...state.psr.needs].sort().join("|") : "";
+          return md.needs.length > 0 && now !== was;
+        }
+        case "psrRemove":
+          return true;
+      }
+      return false;
+    }
+
+    function modalErrors() {
+      const e = {};
+      if (modal === "username" && mstep === 1) {
+        const same = md.u.trim() === state.username;
+        e.u = mt.u && (!ACCOUNT_CHECKS.email(md.u) || same) ? (same ? "This is already your username" : "Enter an email address, like name@example.com") : "";
+        e.c = mt.c && md.c !== md.u ? "Usernames don’t match" : "";
+      }
+      if (modal === "password") e.cf = mt.cf && md.cf !== md.nw ? "Passwords don’t match" : "";
+      if (modal === "bank") {
+        e.holder = mt.holder && !md.holder.trim() ? "Enter the account holder’s name" : "";
+        e.acct = mt.acct && !/^\d{8}$/.test(md.acct) ? "Must be 8 digits" : "";
+        e.sort = mt.sort && !/^\d{2}-\d{2}-\d{2}$/.test(md.sort) ? "Use the format 00-00-00" : "";
+      }
+      return e;
+    }
+
+    function paintModal() {
+      const errors = modalErrors();
+      $$("[data-m]", modalBody).forEach((input) => {
+        const key = input.dataset.m;
+        const msg = errors[key] || "";
+        if (msg) input.setAttribute("aria-invalid", "true");
+        else input.removeAttribute("aria-invalid");
+        const hint = $(`[data-m-err="${key}"]`, modalBody);
+        if (hint) {
+          if (msg) hint.textContent = msg;
+          hint.hidden = !msg;
+        }
+        if (modal === "password") input.type = md.show ? "text" : "password";
+      });
+      const rules = $("[data-acct-rules]", modalBody);
+      if (rules)
+        rules.innerHTML = [
+          ["At least 8 characters", md.nw.length >= 8],
+          ["At least one number", /\d/.test(md.nw)],
+          ["At least one capital letter", /[A-Z]/.test(md.nw)],
+        ]
+          .map(([label, ok]) => `<li class="${ok ? "is-ok" : ""}"><span aria-hidden="true">${ok ? "✓" : "○"}</span>${label}<span class="sr-only">${ok ? ", done" : ", not done yet"}</span></li>`)
+          .join("");
+      const none = $("[data-acct-psr-none]", modalBody);
+      if (none) none.hidden = !(mt.needs && md.needs.length === 0);
+      const err = $("[data-acct-modal-error]", root);
+      err.hidden = error !== "modal";
+      $("[data-acct-modal-error-text]", root).textContent =
+        modal === "username" && mstep === 2 ? "That code didn’t work. Check it and try again, or send a new code." : "We couldn’t save your changes. Please try again.";
+      modalSubmit.setAttribute("aria-disabled", String(!modalValid() || Boolean(busy)));
+      setBusy(modalSubmit, busy === "modal");
+    }
+
+    function renderModal() {
+      const info = modalInfo();
+      $("[data-acct-modal-title]", root).textContent = info.title;
+      const sub = $("[data-acct-modal-sub]", root);
+      sub.textContent = info.sub;
+      sub.hidden = !info.sub;
+      modalSubmit.textContent = info.btn;
+      $("[data-acct-modal-cancel]", root).textContent = modal === "psrRemove" ? "Keep registration" : "Cancel";
+      modalBody.innerHTML = modalBodyHtml();
+      $$("[data-m]", modalBody).forEach((input) => (input.value = md[input.dataset.m] ?? ""));
+      $$("[data-m-check]", modalBody).forEach((box) => (box.checked = Boolean(md[box.dataset.mCheck])));
+      $$("[data-m-need]", modalBody).forEach((box) => (box.checked = md.needs.includes(PSR_NEEDS[box.dataset.mNeed])));
+      paintModal();
+      const first = $("input, select", modalBody) || modalSubmit;
+      first.focus();
+    }
+
+    function openModal(kind, from) {
+      if (editing) cancelEdit();
+      modal = kind;
+      mstep = 1;
+      mt = {};
+      error = null;
+      md = {
+        username: { u: "", c: "", code: "" },
+        password: { cur: "", nw: "", cf: "", show: false },
+        bank: { holder: "", acct: "", sort: "", day: String(state.dd.day || 1), auth: false },
+        psr: { needs: state.psr.reg ? [...state.psr.needs] : [] },
+        psrRemove: {},
+      }[kind];
+      opener = from;
+      dialog.classList.toggle("is-confirm", kind === "psrRemove");
+      dialog.showModal();
+      renderModal();
+    }
+
+    function closeModal() {
+      if (busy === "modal") return;
+      dialog.close();
+    }
+
+    function submitModal() {
+      if (busy) return;
+      if (!modalValid()) {
+        $$("[data-m]", modalBody).forEach((input) => (mt[input.dataset.m] = true));
+        mt.needs = true;
+        paintModal();
+        const bad = $('[aria-invalid="true"]', modalBody);
+        if (bad) bad.focus();
+        return;
+      }
+      busy = "modal";
+      error = null;
+      paintModal();
+      if (modal === "username" && mstep === 1) {
+        later(800, () => {
+          busy = null;
+          mstep = 2;
+          renderModal();
+        });
+        return;
+      }
+      later(1100, () => {
+        busy = null;
+        if (state.fail) {
+          error = "modal";
+          paintModal();
+          return;
+        }
+        let message = "Your details have been updated";
+        if (modal === "username") state.username = md.u.trim();
+        if (modal === "bank") {
+          if (!ddSet()) message = "Direct Debit set up";
+          state.dd = { set: true, holder: md.holder.trim(), last4: md.acct.slice(-4), sortEnd: md.sort.slice(-2), day: Number(md.day) };
+        }
+        if (modal === "psr") {
+          const date = state.psr.reg ? state.psr.date : new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+          if (!state.psr.reg) message = "You’re now on the Priority Services Register";
+          state.psr = { reg: true, date, needs: [...md.needs] };
+        }
+        if (modal === "psrRemove") {
+          state.psr = { reg: false, date: "", needs: [] };
+          message = "You’ve been removed from the Priority Services Register";
+        }
+        save();
+        const kind = modal;
+        dialog.close();
+        paintAll();
+        if (kind === "psr" || kind === "psrRemove") {
+          const next = $(`[data-acct-psr="${state.psr.reg ? "yes" : "no"}"] .btn-primary`, root);
+          if (next) next.focus();
+        }
+        toast(message);
+      });
+    }
+
+    dialog.addEventListener("cancel", (e) => {
+      if (busy === "modal") e.preventDefault();
+    });
+
+    dialog.addEventListener("close", () => {
+      modal = null;
+      md = {};
+      mt = {};
+      error = null;
+      if (opener && document.contains(opener) && !opener.closest("[hidden]")) opener.focus();
+      opener = null;
+    });
+
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeModal();
+    });
+
+    $("[data-acct-modal-form]", root).addEventListener("submit", (e) => {
+      e.preventDefault();
+      submitModal();
+    });
+
+    modalBody.addEventListener("input", (e) => {
+      const input = e.target.closest("[data-m]");
+      if (!input) return;
+      const key = input.dataset.m;
+      let value = input.value;
+      if (key === "acct") value = value.replace(/\D/g, "").slice(0, 8);
+      if (key === "code") value = value.replace(/\D/g, "").slice(0, 6);
+      if (key === "sort") value = (value.replace(/\D/g, "").slice(0, 6).match(/.{1,2}/g) || []).join("-");
+      if (value !== input.value) input.value = value;
+      md[key] = value;
+      if (error === "modal") error = null;
+      paintModal();
+    });
+
+    modalBody.addEventListener("change", (e) => {
+      const check = e.target.closest("[data-m-check]");
+      if (check) md[check.dataset.mCheck] = check.checked;
+      const need = e.target.closest("[data-m-need]");
+      if (need) {
+        const label = PSR_NEEDS[need.dataset.mNeed];
+        md.needs = need.checked ? [...md.needs, label] : md.needs.filter((n) => n !== label);
+        mt.needs = true;
+      }
+      if (e.target.matches('select[data-m="day"]')) md.day = e.target.value;
+      paintModal();
+    });
+
+    modalBody.addEventListener(
+      "blur",
+      (e) => {
+        const input = e.target.closest("[data-m]");
+        if (!input) return;
+        mt[input.dataset.m] = true;
+        paintModal();
+      },
+      true
+    );
+
+    /* Events */
+
+    $("[data-acct-form=contact]", root).addEventListener("submit", (e) => {
+      e.preventDefault();
+      saveEdit();
+    });
+
+    $$("[data-acct-input]", root).forEach((input) => {
+      input.addEventListener("input", () => {
+        draft[input.dataset.acctInput] = input.value;
+        if (error === "contact") error = null;
+        paintEdit();
+      });
+      input.addEventListener("blur", () => {
+        touched[input.dataset.acctInput] = true;
+        paintContactErrors();
+      });
+    });
+
+    $$('input[name="acct-freq"]', root).forEach((radio) =>
+      radio.addEventListener("change", () => {
+        draft.freq = radio.value;
+        paintEdit();
+      })
+    );
+
+    root.addEventListener("click", (e) => {
+      const row = e.target.closest(".acct-row");
+      if (row && mobile.matches) {
+        e.preventDefault();
+        history.pushState({ acct: true }, "", row.getAttribute("href"));
+        paintPage();
+        return;
+      }
+      if (e.target.closest("[data-acct-back]")) {
+        goBack();
+        return;
+      }
+      const contactLink = e.target.closest("[data-acct-contact-link]");
+      if (contactLink) {
+        e.preventDefault();
+        if (mobile.matches) {
+          history.pushState({ acct: true }, "", "#contactus");
+          paintPage();
+        } else {
+          toast("Contact us isn't part of this demo yet");
+        }
+        return;
+      }
+      const edit = e.target.closest("[data-acct-edit]");
+      if (edit) {
+        startEdit(edit.dataset.acctEdit);
+        return;
+      }
+      if (e.target.closest("[data-acct-cancel]")) {
+        cancelEdit();
+        return;
+      }
+      const saveBtn = e.target.closest("[data-acct-save]");
+      if (saveBtn && saveBtn.type !== "submit") {
+        saveEdit();
+        return;
+      }
+      const pref = e.target.closest("[data-acct-pref]");
+      if (pref) {
+        if (editing !== "marketing") return;
+        draft[pref.dataset.acctPref] = !draft[pref.dataset.acctPref];
+        if (error === "marketing") error = null;
+        paintEdit();
+        return;
+      }
+      const open = e.target.closest("[data-acct-modal-open]");
+      if (open) {
+        openModal(open.dataset.acctModalOpen, open);
+        return;
+      }
+      if (e.target.closest("[data-acct-modal-close]")) {
+        closeModal();
+        return;
+      }
+      if (e.target.closest("[data-acct-resend]")) {
+        md.code = "";
+        error = null;
+        renderModal();
+        toast("We’ve sent a new code");
+        return;
+      }
+      const acc = e.target.closest("[data-acct-acc]");
+      if (acc) {
+        const isOpen = acc.getAttribute("aria-expanded") !== "true";
+        acc.setAttribute("aria-expanded", String(isOpen));
+        document.getElementById(acc.getAttribute("aria-controls")).hidden = !isOpen;
+      }
+    });
+
+    window.addEventListener("popstate", paintPage);
+    window.addEventListener("hashchange", paintPage);
+    mobile.addEventListener("change", paintPage);
+
+    /* Prototype controls */
+
+    const panel = $("[data-proto-panel]");
+    const proto = document.createElement("div");
+    proto.className = "proto-group";
+    proto.innerHTML = `
+      <p class="proto-note">Your account</p>
+      <label class="proto-check"><input type="checkbox" data-acct-proto="dd" />Direct Debit set up</label>
+      <label class="proto-check"><input type="checkbox" data-acct-proto="psr" />On the Priority Services Register</label>
+      <label class="proto-check"><input type="checkbox" data-acct-proto="fail" />Simulate save failure</label>
+      <p class="proto-note">Smart meter preferences show for smart meter customers.</p>
+      <button type="button" class="link-btn" data-acct-proto-reset>Reset Your account</button>`;
+    if (panel) panel.append(proto);
+
+    function paintProto() {
+      const values = { dd: ddSet(), psr: state.psr.reg, fail: state.fail };
+      $$("[data-acct-proto]", proto).forEach((box) => (box.checked = values[box.dataset.acctProto]));
+    }
+
+    proto.addEventListener("change", (e) => {
+      const key = e.target.dataset.acctProto;
+      if (key === "dd") state.dd.set = e.target.checked;
+      if (key === "psr") state.psr = e.target.checked ? { ...accountDefaults().psr } : { reg: false, date: "", needs: [] };
+      if (key === "fail") state.fail = e.target.checked;
+      save();
+      paintAll();
+    });
+
+    proto.addEventListener("click", (e) => {
+      if (!e.target.closest("[data-acct-proto-reset]")) return;
+      state = accountDefaults();
+      save();
+      if (editing) cancelEdit();
+      paintAll();
+      toast("Your account reset");
+    });
+
+    paintAll();
+    paintEdit();
+    onTariffChange(paintAll);
+    onCustomerChange(paintAll);
   }
 
   /* ---------- Demo-only actions ---------- */

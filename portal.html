@@ -9,7 +9,7 @@
     <title>Home · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=65" />
+    <link rel="stylesheet" href="css/styles.css?v=82" />
     <script src="js/theme.js?v=10"></script>
   </head>
   <body>
@@ -89,7 +89,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
           Your tariff
         </a>
-        <a class="nav-item" href="#" data-demo="Your account">
+        <a class="nav-item" href="account.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
@@ -141,6 +141,34 @@
                 <span data-supply-line>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section class="card tariff-cta is-renew rise" data-home-tariff="renewal" hidden aria-labelledby="home-renew-title">
+          <span class="tariff-cta-ico" aria-hidden="true">
+            <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" /><path d="M8 3.5v3M16 3.5v3M4 10h16M12 13v3l2 1" /></svg>
+          </span>
+          <div class="tariff-cta-copy">
+            <h2 id="home-renew-title">Your fixed tariff ends in [48] days</h2>
+            <p>Choose your next tariff by [date]</p>
+            <p class="muted">If you do nothing, you’ll move to our [standard variable tariff name].</p>
+          </div>
+          <a class="btn btn-primary" href="tariff-journey.html?journey=renewal&amp;from=home">See renewal options</a>
+        </section>
+
+        <section class="card tariff-cta is-dd rise" data-home-tariff="pob" hidden aria-labelledby="home-dd-title">
+          <div class="tariff-cta-copy">
+            <h2 id="home-dd-title">Switch to Direct Debit</h2>
+            <p>[Benefit copy – Pricing to confirm, e.g. lower rates and less to think about]</p>
+          </div>
+          <ol class="dd-steps">
+            <li><span class="dd-step-num">1</span><b>Choose a tariff</b><span>Pick a Direct Debit tariff</span></li>
+            <li><span class="dd-step-num">2</span><b>Set up Direct Debit</b><span>Add your bank details</span></li>
+            <li><span class="dd-step-num">3</span><b>Confirm</b><span>Review and switch</span></li>
+          </ol>
+          <div class="tariff-cta-actions">
+            <a class="btn btn-secondary" href="tariff.html">Find out more</a>
+            <a class="btn btn-primary" href="tariff-journey.html?journey=dd&amp;from=home">Switch to Direct Debit</a>
           </div>
         </section>
 
@@ -321,7 +349,7 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M1.5 9V3a1.5 1.5 0 0 1 1.5-1.5h6l7.5 7.5-7.5 7.5z" /><circle cx="5.5" cy="5.5" r="1.2" /></svg>
           Your tariff
         </a>
-        <a class="nav-item" href="#" data-demo="Your account">
+        <a class="nav-item" href="account.html">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
           Your account
         </a>
@@ -400,6 +428,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=36"></script>
+    <script src="js/app.js?v=50"></script>
   </body>
 </html>
