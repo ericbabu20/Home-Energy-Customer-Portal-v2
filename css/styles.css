@@ -8223,3 +8223,151 @@ body:has(.chat-fab) .layout { padding-bottom: 88px; }
 /* ============ Your tariff: version 3 (no tariff change) ============ */
 
 .tariff.is-v3 [data-tariff-show="renew-done"] .link-btn { display: none; }
+
+/* ============ Account menu (header avatar) ============ */
+
+.account-menu {
+  position: relative;
+  flex: none;
+}
+
+.avatar[data-account-toggle] {
+  transition: box-shadow 0.18s var(--ease), transform 0.18s var(--ease);
+}
+
+.avatar[data-account-toggle]:hover,
+.avatar[aria-expanded="true"] {
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent), var(--btn-primary-shadow);
+}
+
+.account-pop {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 70;
+  width: 272px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 20px;
+  border: 1px solid var(--line-soft);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+  outline: none;
+}
+
+.account-pop[hidden] { display: none; }
+
+.account-pop-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 12px;
+}
+
+.account-pop-avatar,
+.sheet-account-avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--btn-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.account-pop-who,
+.sheet-account-who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.account-pop-who b,
+.sheet-account-who b {
+  font-size: 16px;
+  color: var(--text);
+}
+
+.account-pop-who > span,
+.sheet-account-who > span {
+  font-size: 14px;
+  color: var(--text-3);
+}
+
+.account-pop-group {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.account-pop-group:last-child { padding-bottom: 0; }
+
+.account-pop-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 44px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-pop-item:hover,
+.account-pop-item:focus-visible { background: var(--surface-sunken); }
+
+.account-pop-item[aria-current="page"] { font-weight: 700; }
+
+.account-pop-item .icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--text-2);
+}
+
+.sheet-account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.sheet-account-avatar { width: 44px; height: 44px; }
+
+.sheet-account .chev {
+  width: 8px;
+  height: 14px;
+  margin-left: auto;
+  flex: none;
+  color: var(--text-3);
+  stroke-width: 2;
+}
+
+.sheet-account[aria-current="page"] { box-shadow: inset 0 0 0 2px var(--accent); }
+
+:root:not(.account-menu-off) [data-account-old],
+:root.account-menu-off [data-account-new] { display: none; }
+
+@media (max-width: 1080px) {
+  .account-menu { display: none; }
+}

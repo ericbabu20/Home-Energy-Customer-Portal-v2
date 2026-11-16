@@ -582,6 +582,9 @@
       showAddress(input.dataset.full);
       const accountEl = $("[data-account]");
       if (accountEl) accountEl.textContent = input.dataset.account;
+      $$("[data-account-number]").forEach((el) => {
+        el.textContent = input.dataset.account;
+      });
       const copy = $("[data-copy]");
       if (copy) copy.dataset.copy = input.dataset.account;
       $$(".address-option", dialog).forEach((label) => {
@@ -3056,6 +3059,17 @@
     const toggle = $("[data-proto-toggle]");
     const menu = $(".proto-menu");
     if (!panel || !toggle || !menu) return;
+    if ($("[data-account-menu]")) {
+      const accountControls = document.createElement("div");
+      accountControls.className = "proto-group";
+      accountControls.innerHTML = `
+        <p class="proto-note">Account button</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Account button">
+          <button type="button" role="radio" data-account-mode="menu" aria-checked="false">Account menu</button>
+          <button type="button" role="radio" data-account-mode="signout" aria-checked="false">Sign out only</button>
+        </div>`;
+      panel.append(accountControls);
+    }
     const tariffControls = document.createElement("div");
     tariffControls.className = "proto-group";
     tariffControls.innerHTML = `
@@ -3101,6 +3115,12 @@
         setCustomer(choice.dataset.customer);
         return;
       }
+      const accountMode = e.target.closest("[data-account-mode]");
+      if (accountMode) {
+        sessionStorage.setItem(ACCOUNT_MENU_KEY, accountMode.dataset.accountMode);
+        paintAccountMenu();
+        return;
+      }
       const scenario = e.target.closest("[data-tariff-scenario]");
       if (scenario) {
         if (scenario.dataset.tariffScenario !== tariffScenario()) changeTariffPrototype(scenario.dataset.tariffScenario);
@@ -3133,6 +3153,74 @@
     });
     paintCustomer();
     paintTariffControls();
+    paintAccountMenu();
+  }
+
+  /* ---------- Account menu (header avatar) ---------- */
+
+  const ACCOUNT_MENU_KEY = "he-account-menu";
+
+  function accountMenuOff() {
+    return sessionStorage.getItem(ACCOUNT_MENU_KEY) === "signout";
+  }
+
+  function paintAccountMenu() {
+    const off = accountMenuOff();
+    document.documentElement.classList.toggle("account-menu-off", off);
+    $$("[data-account-mode]").forEach((btn) => btn.setAttribute("aria-checked", String((btn.dataset.accountMode === "signout") === off)));
+    const toggle = $("[data-account-toggle]");
+    if (!toggle) return;
+    toggle.setAttribute("aria-label", off ? "Sign out of Keith Bastian's account" : "Account menu for Keith Bastian");
+    if (off) {
+      toggle.title = "Sign out";
+      toggle.removeAttribute("aria-expanded");
+      $("[data-account-pop]").hidden = true;
+    } else {
+      toggle.removeAttribute("title");
+      toggle.setAttribute("aria-expanded", String(!$("[data-account-pop]").hidden));
+    }
+  }
+
+  function initAccountMenu() {
+    const wrap = $("[data-account-menu]");
+    if (!wrap) return;
+    const toggle = $("[data-account-toggle]", wrap);
+    const pop = $("[data-account-pop]", wrap);
+    const setOpen = (open) => {
+      pop.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    toggle.addEventListener("click", () => {
+      if (accountMenuOff()) {
+        session.end();
+        location.href = "index.html";
+        return;
+      }
+      const open = pop.hidden;
+      setOpen(open);
+      if (open) $(".account-pop-item", pop).focus();
+    });
+    document.addEventListener("click", (e) => {
+      if (!pop.hidden && !wrap.contains(e.target)) setOpen(false);
+    });
+    pop.addEventListener("click", (e) => {
+      if (e.target.closest(".account-pop-item")) setOpen(false);
+    });
+    wrap.addEventListener("focusout", (e) => {
+      if (!pop.hidden && e.relatedTarget && !wrap.contains(e.relatedTarget)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !pop.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    if (/\/account\.html$/.test(location.pathname)) {
+      $$('a[href="account.html"]', document).forEach((link) => {
+        if (link.closest("[data-account-pop], [data-account-new]")) link.setAttribute("aria-current", "page");
+      });
+    }
+    paintAccountMenu();
   }
 
   function initPortal() {
@@ -3149,6 +3237,7 @@
     initHeaderEdge();
     initTips();
     initCopy();
+    initAccountMenu();
     initPrototype();
     initTariffJourney();
     initHomeTariff();
