@@ -8,7 +8,7 @@
     <title>Your tariff · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=83" />
+    <link rel="stylesheet" href="css/styles.css?v=101" />
     <script src="js/theme.js?v=10"></script>
   </head>
   <body>
@@ -100,9 +100,13 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
           Help &amp; support
         </a>
+        <a class="nav-item" href="portal.html#chat" data-chat-link>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" /></svg>
+          Chat with us
+        </a>
       </nav>
 
-      <main id="main" class="content-panel tariff" data-tariff>
+      <main id="main" class="content-panel tariff" data-tariff data-fuel-view="elec">
 <h1 class="page-title"><span class="page-mark" aria-hidden="true"></span>Your tariff</h1>
 
         <button type="button" class="address-picker m-address bare" data-address-open aria-haspopup="dialog" aria-controls="address-dialog" aria-expanded="false">
@@ -153,7 +157,6 @@
 
         <section class="tariff-hero" aria-labelledby="tariff-name" data-tariff-hero>
           <div class="tariff-top">
-            <p class="tariff-eyebrow">Current tariff</p>
             <div class="tariff-type">
               <span class="tariff-chip" data-tariff-chip>Variable tariff</span>
               <button type="button" class="info-dot" data-tariff-info aria-expanded="false" aria-controls="tariff-type-note" aria-label="About a variable tariff">
@@ -218,9 +221,6 @@
               <a class="link-btn on-dark" href="tariff-journey.html?journey=dd" data-tariff-show="pay-link" hidden>Switch to Direct Debit</a>
             </div>
           </dl>
-          <div class="tariff-hero-actions" data-tariff-show="compare" hidden>
-            <a class="btn tariff-ghost" href="tariff-journey.html?journey=change">Compare tariffs</a>
-          </div>
         </section>
 
         <section class="tariff-cta is-dd" data-tariff-show="promo" hidden aria-labelledby="tariff-dd-title">
@@ -239,13 +239,17 @@
           </div>
         </section>
 
+        <div class="tariff-body">
         <section class="tariff-section" aria-labelledby="tariff-rates" data-tariff-rates>
           <div class="tariff-section-head">
             <h2 id="tariff-rates">Tariff rates</h2>
-            <p>Rates from [date]</p>
+            <div class="segmented wide fuel-switch" role="radiogroup" aria-label="Show rates for" data-fuel-switch>
+              <button type="button" role="radio" data-fuel-value="elec" aria-checked="true">Electricity</button>
+              <button type="button" role="radio" data-fuel-value="gas" aria-checked="false">Gas</button>
+            </div>
           </div>
           <div class="rate-cards">
-            <article class="rate-card" aria-labelledby="rate-elec">
+            <article class="rate-card" aria-labelledby="rate-elec" data-fuel="elec">
               <h3 id="rate-elec" class="rate-head">
                 <span class="fuel-tile" aria-hidden="true">
                   <svg class="icon" viewBox="0 0 18 18"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>
@@ -265,9 +269,13 @@
                   <dt>Night rate</dt>
                   <dd>14.86p <span>per kWh</span></dd>
                 </div>
+                <div class="rate-usage">
+                  <dt>Estimated annual usage</dt>
+                  <dd>9,185 <span>kWh a year</span></dd>
+                </div>
               </dl>
             </article>
-            <article class="rate-card" aria-labelledby="rate-gas">
+            <article class="rate-card" aria-labelledby="rate-gas" data-fuel="gas">
               <h3 id="rate-gas" class="rate-head">
                 <span class="fuel-tile" aria-hidden="true">
                   <svg class="icon" viewBox="0 0 18 18"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>
@@ -283,6 +291,10 @@
                   <dt>Unit rate</dt>
                   <dd>20.76p <span>per kWh</span></dd>
                 </div>
+                <div class="rate-usage">
+                  <dt>Estimated annual usage</dt>
+                  <dd>17,000 <span>kWh a year</span></dd>
+                </div>
               </dl>
             </article>
           </div>
@@ -292,9 +304,9 @@
               <svg class="icon" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" /><path d="M8 7.2V11.2M8 5h.01" /></svg>
             </span>
             <div>
-              <p class="vat-note">All rates include VAT: 5% on gas and 0% on electricity. The government has cut VAT on household electricity in Great Britain from 5% to 0% from 1 October 2026 until [end date].</p>
+              <p class="vat-note">All rates include VAT: 5% on gas and 0% on electricity.</p>
               <button type="button" class="link-btn" data-vat aria-expanded="false" aria-controls="vat-more">Find out more about the VAT change</button>
-              <p class="vat-more" id="vat-more" data-vat-more hidden>The 0% rate applies to household electricity in Great Britain for this period. Gas stays at 5%. The prices on this page already include that tax.</p>
+              <p class="vat-more" id="vat-more" data-vat-more hidden>The government has cut VAT on household electricity in Great Britain from 5% to 0% from 1 October 2026 until [end date]. Gas stays at 5%. The prices on this page already include that tax.</p>
             </div>
           </div>
         </section>
@@ -304,7 +316,7 @@
             <h2 id="tariff-usage">Estimated annual usage</h2>
           </div>
           <div class="usage-stats">
-            <div class="usage-stat">
+            <div class="usage-stat" data-fuel="elec">
               <span class="fuel-tile" aria-hidden="true">
                 <svg class="icon" viewBox="0 0 18 18"><path d="M10.2 1.2 3.4 10.2h4.2L7.2 16.8l7.4-9.6H10z" /></svg>
               </span>
@@ -313,7 +325,7 @@
                 <strong>9,185 <em>kWh a year</em></strong>
               </div>
             </div>
-            <div class="usage-stat">
+            <div class="usage-stat" data-fuel="gas">
               <span class="fuel-tile" aria-hidden="true">
                 <svg class="icon" viewBox="0 0 18 18"><path d="M9 16.2c2.6-1.6 4.2-4 4.2-6.6 0-2.2-1.1-3.6-2.2-5.1-.3 1.8-1.2 2.6-2 2.6.2-2.2-.6-4-2.2-5.6-.2 2.6-.8 4.1-2.2 5.5C3.4 8.4 2.6 9.8 2.6 11.4c0 3 2.6 4.8 6.4 4.8z" /></svg>
               </span>
@@ -330,8 +342,14 @@
             <h2 id="tariff-entry-title">Other tariffs you can switch to</h2>
             <p>Compare fixed, variable and smart tariffs with your current one.</p>
           </div>
+          <ul class="entry-kinds">
+            <li><b>Fixed</b><span>Rates stay the same for a set term</span></li>
+            <li><b>Variable</b><span>Rates follow the Ofgem price cap</span></li>
+            <li><b>Smart</b><span>Different rates for day and night</span></li>
+          </ul>
           <a class="btn btn-primary" href="tariff-journey.html?journey=change">Compare tariffs</a>
         </section>
+        </div>
       </main>
     </div>
 
@@ -377,6 +395,10 @@
         <a class="nav-item" href="#" data-demo="Help and support">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
           Help &amp; support
+        </a>
+        <a class="nav-item" href="portal.html#chat" data-chat-link>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" /></svg>
+          Chat with us
         </a>
       </nav>
 
@@ -445,6 +467,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=53"></script>
+    <script src="js/app.js?v=59"></script>
   </body>
 </html>

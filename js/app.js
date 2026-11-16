@@ -47,6 +47,8 @@
   const TARIFF_KEY = "he-tariff";
   const TARIFF_OUTCOME_KEY = "he-tariff-outcome";
   const TARIFF_DONE_KEY = "he-tariff-done";
+  const TARIFF_TYPE_KEY = "he-tariff-type";
+  const TARIFF_VIEW_KEY = "he-tariff-view";
   const TOAST_KEY = "he-toast";
   const TARIFF_SCENARIOS = {
     change: "Change tariff",
@@ -103,6 +105,17 @@
     return TARIFF_OUTCOMES[tariffScenario()].some(([value]) => value === id) ? id : "ok";
   }
 
+  function tariffFixed() {
+    const type = sessionStorage.getItem(TARIFF_TYPE_KEY);
+    if (type === "fixed" || type === "variable") return type === "fixed";
+    return tariffScenario() === "renewal" && tariffOutcome() !== "ended";
+  }
+
+  function tariffView() {
+    const view = sessionStorage.getItem(TARIFF_VIEW_KEY);
+    return view === "v2" || view === "v3" ? view : "v1";
+  }
+
   function tariffDone() {
     try {
       return JSON.parse(sessionStorage.getItem(TARIFF_DONE_KEY)) || {};
@@ -124,6 +137,10 @@
     const scenario = tariffScenario();
     const outcome = tariffOutcome();
     $$("[data-tariff-scenario]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffScenario === scenario)));
+    const fixed = tariffFixed();
+    $$("[data-tariff-type]").forEach((btn) => btn.setAttribute("aria-checked", String((btn.dataset.tariffType === "fixed") === fixed)));
+    const view = tariffView();
+    $$("[data-tariff-view]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffView === view)));
     const note = $("[data-tariff-scenario-note]");
     if (note) note.textContent = TARIFF_NOTES[scenario];
     const box = $("[data-tariff-outcomes]");
@@ -146,6 +163,19 @@
     if (outcome && outcome !== "ok") sessionStorage.setItem(TARIFF_OUTCOME_KEY, outcome);
     else sessionStorage.removeItem(TARIFF_OUTCOME_KEY);
     sessionStorage.removeItem(TARIFF_DONE_KEY);
+    sessionStorage.removeItem(TARIFF_TYPE_KEY);
+    paintTariffControls();
+    tariffHooks.forEach((fn) => fn());
+  }
+
+  function setTariffType(type) {
+    sessionStorage.setItem(TARIFF_TYPE_KEY, type);
+    paintTariffControls();
+    tariffHooks.forEach((fn) => fn());
+  }
+
+  function setTariffView(view) {
+    sessionStorage.setItem(TARIFF_VIEW_KEY, view);
     paintTariffControls();
     tariffHooks.forEach((fn) => fn());
   }
@@ -1279,13 +1309,22 @@
         info.setAttribute("aria-expanded", String(open));
       });
     }
+    const fuelSwitch = $("[data-fuel-switch]");
+    if (fuelSwitch) {
+      fuelSwitch.addEventListener("click", (e) => {
+        const choice = e.target.closest("[data-fuel-value]");
+        if (!choice) return;
+        $("[data-tariff]").dataset.fuelView = choice.dataset.fuelValue;
+        $$("[data-fuel-value]", fuelSwitch).forEach((btn) => btn.setAttribute("aria-checked", String(btn === choice)));
+      });
+    }
     paintTariffPage();
   }
 
   function paintTariffPage() {
     const hero = $("[data-tariff-hero]");
     if (!hero) return;
-    const rateCells = $$("[data-tariff-rates] .rate-list dd").map((dd) => ({ node: dd.firstChild, text: dd.firstChild.textContent }));
+    const rateCells = $$("[data-tariff-rates] .rate-list > div:not(.rate-usage) dd").map((dd) => ({ node: dd.firstChild, text: dd.firstChild.textContent }));
     let closedDismissed = false;
     const set = (sel, text) => {
       const el = $(sel);
@@ -1297,20 +1336,25 @@
       const outcome = tariffOutcome();
       const done = tariffDone();
       const renewal = scenario === "renewal";
-      const fixed = renewal && outcome !== "ended";
+      const fixed = tariffFixed();
       const ddDone = scenario === "pob" && Boolean(done.dd);
       const closed = renewal && outcome === "closed" && done.closed;
       const show = {
         closed: closed && !closedDismissed,
         ended: renewal && outcome === "ended",
-        renew: fixed && !done.renewal && !closed && outcome !== "noOptions",
+        renew: renewal && fixed && !done.renewal && !closed && outcome !== "noOptions",
         "renew-done": renewal && Boolean(done.renewal),
         "no-options": renewal && outcome === "noOptions" && !done.renewal,
         "pay-link": scenario === "pob" && !ddDone,
         promo: scenario === "pob" && !ddDone,
-        compare: scenario === "change" || (renewal && (outcome === "ended" || closed)),
         entry: scenario === "change" || (renewal && (outcome === "ended" || closed)),
       };
+      const view = tariffView();
+      if (view === "v3") {
+        ["closed", "renew", "no-options", "pay-link", "promo", "entry"].forEach((key) => {
+          show[key] = false;
+        });
+      }
       $$("[data-tariff-show]").forEach((el) => {
         el.hidden = !show[el.dataset.tariffShow];
       });
@@ -1335,7 +1379,11 @@
       );
       const info = $("[data-tariff-info]");
       if (info) info.setAttribute("aria-label", fixed ? "About a fixed tariff" : "About a variable tariff");
-      $("[data-tariff-tenure]").classList.toggle("is-fixed", fixed);
+      $("[data-tariff]").classList.toggle("is-v2", view !== "v1");
+      $("[data-tariff]").classList.toggle("is-v3", view === "v3");
+      const tenure = $("[data-tariff-tenure]");
+      tenure.classList.toggle("is-fixed", fixed);
+      tenure.hidden = !fixed;
 
       set("[data-tariff-renewed]", TARIFFS[done.renewal] ? TARIFFS[done.renewal].name : "");
       const fixedRates = [...TARIFFS.curFixed.rates.elec, ...TARIFFS.curFixed.rates.gas];
@@ -3021,6 +3069,23 @@
       <p class="proto-note">Tariff outcome</p>
       <div class="proto-choices" role="radiogroup" aria-label="Tariff outcome" data-tariff-outcomes></div>
       <button type="button" class="link-btn" data-tariff-reset>Reset tariff journeys</button>`;
+    if ($("[data-tariff-hero]")) {
+      const typeControls = document.createElement("div");
+      typeControls.className = "proto-group";
+      typeControls.innerHTML = `
+        <p class="proto-note">Page version</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Page version">
+          <button type="button" role="radio" data-tariff-view="v1" aria-checked="false">Version 1</button>
+          <button type="button" role="radio" data-tariff-view="v2" aria-checked="false">Version 2</button>
+          <button type="button" role="radio" data-tariff-view="v3" aria-checked="false">Version 3</button>
+        </div>
+        <p class="proto-note">Tariff type</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Tariff type">
+          <button type="button" role="radio" data-tariff-type="fixed" aria-checked="false">Fixed tariff</button>
+          <button type="button" role="radio" data-tariff-type="variable" aria-checked="false">Variable tariff</button>
+        </div>`;
+      panel.append(typeControls);
+    }
     panel.append(tariffControls);
     function setOpen(open) {
       panel.hidden = !open;
@@ -3039,6 +3104,16 @@
       const scenario = e.target.closest("[data-tariff-scenario]");
       if (scenario) {
         if (scenario.dataset.tariffScenario !== tariffScenario()) changeTariffPrototype(scenario.dataset.tariffScenario);
+        return;
+      }
+      const view = e.target.closest("[data-tariff-view]");
+      if (view) {
+        if (view.dataset.tariffView !== tariffView()) setTariffView(view.dataset.tariffView);
+        return;
+      }
+      const type = e.target.closest("[data-tariff-type]");
+      if (type) {
+        if ((type.dataset.tariffType === "fixed") !== tariffFixed()) setTariffType(type.dataset.tariffType);
         return;
       }
       const outcome = e.target.closest("[data-tariff-outcome]");
@@ -3793,9 +3868,43 @@
     });
   }
 
+  function initChat() {
+    const panel = $("[data-chat-panel]");
+    const open = $("[data-chat-open]");
+    if (!panel || !open) return;
+    const input = $("#chat-message", panel);
+    function setOpen(show) {
+      panel.hidden = !show;
+      open.setAttribute("aria-expanded", String(show));
+      (show ? input : open).focus();
+    }
+    open.addEventListener("click", () => setOpen(true));
+    $$("[data-chat-link]").forEach((link) =>
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        $("[data-menu-close]")?.click();
+        setOpen(true);
+      })
+    );
+    if (location.hash === "#chat") {
+      history.replaceState(null, "", location.pathname + location.search);
+      setOpen(true);
+    }
+    $("[data-chat-close]", panel).addEventListener("click", () => setOpen(false));
+    panel.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+    $("[data-chat-form]", panel).addEventListener("submit", (e) => {
+      e.preventDefault();
+      input.value = "";
+      toast("Live chat isn't part of this demo yet");
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initDemoActions();
+    initChat();
     initLogin();
     initPortal();
   });

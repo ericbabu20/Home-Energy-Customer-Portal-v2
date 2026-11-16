@@ -3268,8 +3268,8 @@ p {
   overflow: hidden;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 22px;
-  padding: 26px 26px 22px;
+  gap: 16px;
+  padding: 20px 24px;
   border-radius: 28px;
   background:
     radial-gradient(80% 70% at 100% -8%, rgba(224, 123, 26, 0.32), transparent 48%),
@@ -3301,7 +3301,7 @@ p {
 .tariff-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 
@@ -3403,15 +3403,6 @@ p {
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-}
-
-.tariff-eyebrow {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #a9bba6;
 }
 
 .tariff-name {
@@ -3533,8 +3524,8 @@ p {
 }
 
 .fact-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   flex: none;
   border-radius: 10px;
   background: rgba(243, 201, 138, 0.14);
@@ -3552,9 +3543,9 @@ p {
 .tariff-facts div {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   min-width: 0;
-  padding: 14px;
+  padding: 12px 14px;
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.06);
@@ -3610,12 +3601,6 @@ p {
   color: var(--heading);
 }
 
-.tariff-section-head p {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-3);
-}
-
 .rate-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3623,7 +3608,7 @@ p {
 }
 
 .rate-card {
-  padding: 22px 24px 10px;
+  padding: 18px 22px 6px;
   border-radius: var(--radius-xl);
   background: var(--surface);
 }
@@ -3638,8 +3623,8 @@ p {
 }
 
 .fuel-tile {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   flex: none;
   border-radius: 12px;
   background: var(--accent-soft);
@@ -3657,7 +3642,7 @@ p {
 }
 
 .rate-list {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
 }
 
 .rate-list div {
@@ -3665,7 +3650,7 @@ p {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 0;
+  padding: 11px 0;
   border-top: 1px solid var(--line-soft);
 }
 
@@ -3679,7 +3664,7 @@ p {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text);
@@ -3696,8 +3681,8 @@ p {
 .vat-callout {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 18px 20px;
+  gap: 12px;
+  padding: 12px 18px;
   border-radius: var(--radius-lg);
   background: var(--accent-soft);
 }
@@ -3787,8 +3772,8 @@ p {
   }
 
   .tariff-hero {
-    padding: 20px;
-    gap: 18px;
+    padding: 18px 20px;
+    gap: 14px;
     border-radius: 26px;
   }
 
@@ -3801,9 +3786,38 @@ p {
     font-size: 24px;
   }
 
+  .tariff-section {
+    gap: 12px;
+  }
+
+  .rate-cards {
+    gap: 12px;
+  }
+
   .rate-card {
-    padding: 18px 18px 6px;
+    padding: 16px 18px 4px;
     border-radius: 26px;
+  }
+
+  .rate-head .fuel-tile,
+  .usage-stat .fuel-tile {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .rate-head .fuel-tile .icon,
+  .usage-stat .fuel-tile .icon {
+    width: 17px;
+    height: 17px;
+  }
+
+  .rate-list {
+    margin-top: 8px;
+  }
+
+  .rate-list div {
+    padding: 11px 0;
   }
 
   .rate-list dd {
@@ -3811,7 +3825,8 @@ p {
   }
 
   .vat-callout {
-    padding: 16px;
+    gap: 12px;
+    padding: 14px 16px;
   }
 
   .vat-note,
@@ -3820,13 +3835,43 @@ p {
   }
 
   .usage-card {
-    padding: 18px;
+    gap: 12px;
+    padding: 16px 18px 18px;
     border-radius: 26px;
   }
 
   .usage-stats {
-    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
+  }
+
+  .usage-stat {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 8px 10px;
+    padding: 14px;
+  }
+
+  .usage-stat > div {
+    display: contents;
+  }
+
+  .usage-stat p {
+    margin: 0;
+  }
+
+  .usage-stat strong {
+    grid-column: 1 / -1;
+    font-size: 22px;
+  }
+
+  .vat-callout .link-btn {
+    padding: 11px 0;
+    margin: -11px 0;
+  }
+
+  .usage-stat em {
+    display: block;
   }
 }
 
@@ -3842,7 +3887,7 @@ p {
   }
 
   .tariff-facts div {
-    padding: 12px;
+    padding: 10px 12px;
   }
 
   .tariff-facts div:last-child {
@@ -6400,7 +6445,7 @@ p {
 [data-home-tariff][hidden],
 .proto-group [hidden],
 .notice[hidden],
-.tariff-pending[hidden] { display: none !important; }
+.tariff-tenure[hidden] { display: none !important; }
 
 .proto-panel {
   max-height: calc(100vh - 120px);
@@ -6599,27 +6644,6 @@ p {
 
 .tariff-entry h2 { margin: 0; font-size: 20px; color: var(--heading); }
 .tariff-entry p { margin: 4px 0 0; color: var(--text-2); }
-
-.tariff-hero-actions { display: flex; }
-
-.tariff-ghost {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  color: #fff;
-}
-
-.tariff-ghost:hover { background: rgba(255, 255, 255, 0.2); }
-
-.tariff-pending {
-  margin: 8px 0 0;
-  padding: 6px 12px;
-  width: fit-content;
-  border-radius: var(--pill);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-}
 
 .tariff-facts .link-btn.on-dark { margin-top: 4px; font-size: 14px; }
 
@@ -7211,12 +7235,16 @@ p {
   .tariff-cta.is-dd,
   .tariff-cta.card.is-dd { grid-template-columns: minmax(0, 1fr); }
   .tariff-cta-copy h2 { font-size: 20px; }
-  .dd-steps { grid-template-columns: minmax(0, 1fr); }
+  .tariff-cta.is-dd { gap: 16px; padding: 18px; }
+  .dd-steps { grid-template-columns: minmax(0, 1fr); gap: 0; border-radius: 16px; background: var(--surface); overflow: hidden; }
+  .dd-steps li { padding: 10px 14px; border-radius: 0; background: none; }
+  .dd-steps li + li { border-top: 1px solid var(--line-soft); }
+  .dd-step-num { width: 28px; height: 28px; font-size: 14px; }
+  .tariff-cta-actions { gap: 10px; }
   .tariff-cta-actions { justify-content: stretch; flex-direction: column-reverse; }
   .tariff-cta-actions .btn,
-  .tariff-entry .btn,
-  .tariff-hero-actions .btn { width: 100%; }
-  .tariff-entry { padding: 20px; }
+  .tariff-entry .btn { width: 100%; }
+  .tariff-entry { gap: 14px; padding: 18px; }
   .notice { flex-wrap: wrap; }
   .notice > .btn { width: 100%; }
   .tj-summary,
@@ -7793,3 +7821,405 @@ b.acct-value { font-weight: 700; }
 
   .acct-modal-inner { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
 }
+
+/* ============ Chat widget ============ */
+
+.chat-fab {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 70;
+  gap: 10px;
+  padding: 0 22px 0 18px;
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.chat-fab .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.chat-fab[aria-expanded="true"] { display: none; }
+
+body:has(.chat-fab) .layout { padding-bottom: 88px; }
+
+.chat-panel {
+  position: fixed;
+  right: max(24px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  z-index: 75;
+  width: min(360px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+
+.chat-panel[hidden] { display: none; }
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px 14px 16px;
+  background: var(--promo-tint);
+}
+
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--btn-primary);
+  color: #fff;
+}
+
+.chat-avatar .icon { width: 20px; height: 20px; }
+
+.chat-head-copy { flex: 1; min-width: 0; }
+.chat-head-copy h2 { margin: 0; font-size: 17px; color: var(--heading); }
+.chat-head-copy p { margin: 2px 0 0; font-size: 13px; color: var(--text-2); }
+
+.chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 180px;
+  padding: 16px;
+}
+
+.chat-bubble {
+  margin: 0;
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--surface-sunken);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.chat-placeholder {
+  margin: auto 0 0;
+  font-size: 13px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.chat-compose {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.chat-compose input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--pill);
+  background: var(--surface-sunken);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+}
+
+.chat-compose .btn { --btn-h: 44px; }
+
+@media (max-width: 720px) {
+  .chat-fab {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    --btn-h: 48px;
+  }
+
+  .chat-panel {
+    left: 12px;
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: auto;
+  }
+
+  .chat-head .icon-btn { width: 44px; height: 44px; }
+}
+/* ============ Your tariff: shared by both versions ============ */
+
+.fuel-switch { display: none; }
+.tariff-body { display: contents; }
+
+@media (min-width: 721px) {
+  .tariff-hero { grid-template-columns: minmax(0, 1fr) auto; }
+  .tariff-hero > * { grid-column: 1 / -1; }
+  .tariff-hero > .tariff-hero-copy { grid-column: 1; grid-row: 1; }
+  .tariff-hero > .tariff-top { grid-column: 2; grid-row: 1; align-self: start; }
+
+  .vat-callout { align-items: center; }
+  .vat-callout > div { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 12px; }
+  .vat-callout .vat-note { margin: 0; }
+  .vat-callout .vat-more { flex-basis: 100%; }
+}
+
+/* ============ Your tariff: version 2 ============ */
+
+.tariff.is-v2 .tariff-hero { gap: 14px; }
+
+.tariff.is-v2 .tariff-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.tariff.is-v2 .tariff-facts div {
+  grid-column: auto;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0 14px;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.tariff.is-v2 .tariff-facts div:first-child { padding-left: 0; border-left: none; }
+.tariff.is-v2 .fact-icon { display: none; }
+.tariff.is-v2 .tariff-facts dd { font-size: 15px; white-space: normal; }
+
+.tariff.is-v2[data-fuel-view="elec"] [data-fuel="gas"],
+.tariff.is-v2[data-fuel-view="gas"] [data-fuel="elec"] { display: none; }
+
+.tariff.is-v2 .tariff-section {
+  gap: 4px;
+  padding: 18px 20px 16px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.tariff.is-v2 .tariff-section > .tariff-section-head {
+  padding: 0;
+  align-items: center;
+}
+
+.tariff.is-v2 .tariff-section-head h2 { font-size: 18px; }
+
+.tariff.is-v2 .fuel-switch {
+  display: inline-flex;
+  width: auto;
+  background: var(--surface-sunken);
+  border: 1px solid var(--line-soft);
+}
+
+.tariff.is-v2 .fuel-switch button {
+  height: 40px;
+  padding: 0 16px;
+}
+
+.tariff.is-v2 .rate-cards { grid-template-columns: minmax(0, 1fr); gap: 0; }
+
+.tariff.is-v2 .rate-card {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.tariff.is-v2 .rate-head {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.tariff.is-v2 .rate-list { margin-top: 10px; }
+.tariff.is-v2 .rate-list div { padding: 11px 0; }
+.tariff.is-v2 .rate-list dd { font-size: 20px; }
+
+.tariff.is-v2 .vat-callout {
+  gap: 10px;
+  margin-top: 6px;
+  padding: 8px 0 0;
+  border-top: none;
+  border-radius: 0;
+  background: none;
+}
+
+.tariff.is-v2 .vat-icon { width: 24px; height: 24px; background: var(--accent-soft); }
+.tariff.is-v2 .vat-note,
+.tariff.is-v2 .vat-more { font-size: 14px; }
+
+.rate-list .rate-usage,
+.entry-kinds { display: none; }
+
+.tariff.is-v2 .usage-card { display: none; }
+
+.tariff.is-v2 .rate-list .rate-usage {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-top: none;
+  border-radius: 14px;
+  background: var(--surface-sunken);
+}
+
+.tariff.is-v2 .rate-usage dt { font-weight: 600; color: var(--text); }
+.tariff.is-v2 .rate-list .rate-usage dd { font-size: 18px; }
+
+.tariff.is-v2 .tariff-entry {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-wrap: nowrap;
+  gap: 14px;
+  padding: 20px;
+  background: var(--promo-tint);
+}
+
+.tariff.is-v2 .tariff-entry h2 { font-size: 18px; }
+.tariff.is-v2 .tariff-entry p { font-size: 14px; }
+
+.tariff.is-v2 .entry-kinds {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.tariff.is-v2 .entry-kinds li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+}
+
+.tariff.is-v2 .entry-kinds li + li { border-top: 1px solid var(--line-soft); }
+.tariff.is-v2 .entry-kinds b { font-size: 15px; color: var(--text); }
+.tariff.is-v2 .entry-kinds span { font-size: 13px; color: var(--text-3); }
+.tariff.is-v2 .tariff-entry .btn { --btn-h: 44px; width: 100%; margin-top: auto; }
+
+@media (min-width: 721px) {
+  .tariff.is-v2 .tariff-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .tariff.is-v2 .tariff-body:has(> .tariff-entry[hidden]) { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .tariff.is-v2 .tariff-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tariff.is-v2 .tariff-name { font-size: 22px; }
+  .tariff.is-v2 .tariff-section { padding: 16px 16px 14px; }
+  .tariff.is-v2 .tariff-facts div { padding: 0 10px; }
+  .tariff.is-v2 .tariff-facts dt { font-size: 12px; }
+  .tariff.is-v2 .tariff-facts dd { font-size: 14px; }
+  .tariff.is-v2 .fuel-switch button { padding: 0 12px; }
+  .tariff.is-v2 .tariff-entry { gap: 12px; padding: 16px; }
+  .tariff.is-v2 .entry-kinds { display: none; }
+}
+
+/* ============ Your tariff: version 2 and 3 hero ============ */
+
+.tariff.is-v2 .tariff-hero-copy { gap: 8px; }
+
+.tariff.is-v2 .tariff-type {
+  position: relative;
+  gap: 2px;
+  height: 36px;
+  padding: 0 4px 0 14px;
+  border-radius: var(--pill);
+  border: 1px solid rgba(243, 201, 138, 0.38);
+  background: rgba(243, 201, 138, 0.12);
+  transition: background-color 0.2s var(--ease);
+}
+
+.tariff.is-v2 .tariff-type:hover,
+.tariff.is-v2 .tariff-type:has([aria-expanded="true"]) { background: rgba(243, 201, 138, 0.22); }
+
+.tariff.is-v2 .tariff-type:has(:focus-visible) {
+  outline: 2px solid #f3c98a;
+  outline-offset: 3px;
+}
+
+.tariff.is-v2 .tariff-chip {
+  height: auto;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.tariff.is-v2 .info-dot,
+.tariff.is-v2 .info-dot:hover,
+.tariff.is-v2 .info-dot[aria-expanded="true"] {
+  position: static;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  color: #f7dcb2;
+}
+
+.tariff.is-v2 .info-dot:focus-visible { outline: none; }
+
+.tariff.is-v2 .info-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--pill);
+}
+
+.tariff.is-v2 .fuel-pair {
+  margin: 0;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #c9d6c6;
+}
+
+.tariff.is-v2 .fuel-pair-icons { gap: 1px; }
+
+.tariff.is-v2 .fuel-pair-icons span {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(243, 201, 138, 0.14);
+}
+
+.tariff.is-v2 .fuel-pair-icons span + span { margin-left: 0; }
+.tariff.is-v2 .fuel-pair-icons .icon { width: 13px; height: 13px; }
+
+.tariff.is-v2 .tariff-facts dt { white-space: nowrap; }
+.tariff.is-v2 .tariff-facts div { justify-content: flex-start; }
+
+@media (max-width: 720px) {
+  .tariff.is-v2 .tariff-hero { gap: 12px; padding: 16px 18px 18px; }
+  .tariff.is-v2 .tariff-type { height: 32px; padding-left: 12px; }
+  .tariff.is-v2 .info-dot::after { inset: -6px; }
+  .tariff.is-v2 .tariff-facts { grid-template-columns: repeat(3, auto); }
+}
+
+/* ============ Your tariff: version 3 (no tariff change) ============ */
+
+.tariff.is-v3 [data-tariff-show="renew-done"] .link-btn { display: none; }
