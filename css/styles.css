@@ -3919,7 +3919,8 @@ p {
 
 .pay-amount {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
+  font-weight: 700;
   font-size: 40px;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -4007,6 +4008,19 @@ p {
 
 .pay-actions .btn {
   flex: 1 1 180px;
+}
+
+.pay-actions .btn-secondary {
+  border: 1px solid var(--line);
+  background: var(--surface-sunken);
+  color: var(--heading);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.pay-actions .btn-secondary:hover {
+  border-color: var(--text-3);
 }
 
 .plan-demo {

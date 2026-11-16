@@ -1337,12 +1337,6 @@
       if (info) info.setAttribute("aria-label", fixed ? "About a fixed tariff" : "About a variable tariff");
       $("[data-tariff-tenure]").classList.toggle("is-fixed", fixed);
 
-      const pendingId = scenario === "pob" ? done.dd || done.partial : done[scenario];
-      const pending = $("[data-tariff-pending]");
-      if (pending) {
-        pending.hidden = !TARIFFS[pendingId];
-        pending.textContent = TARIFFS[pendingId] ? `Switching to ${TARIFFS[pendingId].name} on [date]` : "";
-      }
       set("[data-tariff-renewed]", TARIFFS[done.renewal] ? TARIFFS[done.renewal].name : "");
       const fixedRates = [...TARIFFS.curFixed.rates.elec, ...TARIFFS.curFixed.rates.gas];
       rateCells.forEach(({ node, text }, i) => {
@@ -1878,7 +1872,7 @@
       booked: {
         tone: "ok",
         title: "Your smart meter appointment has been booked",
-        text: "We look forward to visiting you on the scheduled date and time. If you need to make any changes, you can manage your appointment through your account.",
+        text: "If you need to make any changes, you can manage your appointment through your account.",
         note: true,
         actions: DONE,
       },
@@ -1890,7 +1884,7 @@
       },
       cancelled: {
         title: "Your smart meter appointment has been cancelled",
-        text: "Your smart meter appointment has been successfully cancelled. If you change your mind, you can easily book a new appointment through your account at any time.",
+        text: "If you change your mind, you can book a new appointment from your account.",
         actions: [
           ["Book appointment", "rebook", "secondary"],
           ["Done", "home", "primary"],
