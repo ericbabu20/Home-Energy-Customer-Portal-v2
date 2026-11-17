@@ -95,6 +95,95 @@
   const gbp = (n) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const pence = (n) => `${n.toFixed(2)}p`;
 
+  const TOU_QUOTE = {
+    RequestedTariffType: "Fixed + Variable",
+    RequestedFuelType: "Dual Fuel",
+    RequestedBillingType: "Standard + TOU",
+    TariffID: 1342,
+    TariffName: "My EV v8.0",
+    TariffFamilyName: "TOU",
+    TariffShortDescription: null,
+    TariffLongDescription: null,
+    BillingType: "TOU",
+    TariffType: "Smart",
+    TariffFuelType: "Dual Fuel",
+    DualFuelOnly: true,
+    IsFixed: true,
+    IsTracker: false,
+    FixedMonths: 12,
+    ExitFee: 75.0,
+    YearlyTotalExVat: 1489.0779695,
+    YearlyTotalIncVat: 1531.011492975,
+    MonthlyTotalExVat: 124.08983079166667,
+    MonthlyTotalIncVat: 127.58429108125,
+    PriceCapMaximumYearlyTotalIncVat: 0.0,
+    AnnualSaving: 0.0,
+    PercentageDifference: 0.0,
+    IsFeatured: false,
+    Electricity: [
+      {
+        Eac: 1800,
+        NightEac: 0,
+        RegionId: 11,
+        ProfileClass: "01",
+        StandingCharge: 0.5661,
+        VatRate: 1.0,
+        TotalExVat: 650.4075,
+        TotalIncVat: 650.4075,
+        ElectricityRates: [
+          { RateLabel: " Offpeak EV Rate (00:00 - 05:30) UTC", RateValue: 0.095, EacProportion: 50.0, RateEac: 900, VatRate: 1.0, TotalExVat: 85.5, TotalIncVat: 85.5 },
+          { RateLabel: "Day Rate(05:30-00:00) UTC", RateValue: 0.39809, EacProportion: 50.0, RateEac: 900, VatRate: 1.0, TotalExVat: 358.281, TotalIncVat: 358.281 },
+        ],
+      },
+    ],
+    Gas: [{ Aq: 7500, RegionId: 11, StandingCharge: 0.2801143, UnitRate: 0.0981905, VatRate: 1.05, TotalExVat: 838.6704695, TotalIncVat: 880.603992975 }],
+  };
+
+  const vatPence = (pounds, vatRate) => pence(pounds * vatRate * 100);
+  const toMinutes = (hhmm) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+  };
+  const toHhmm = (mins) => {
+    const t = ((mins % 1440) + 1440) % 1440;
+    return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+  };
+
+  function timesFromLabel(label) {
+    const match = label.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+    if (!match) throw new Error(`No time range in rate label: ${label}`);
+    return { start: match[1].padStart(5, "0"), end: match[2].padStart(5, "0") };
+  }
+
+  function touView(quote) {
+    const elec = quote.Electricity[0];
+    const gas = quote.Gas[0];
+    const rates = elec.ElectricityRates.map((r) => ({ ...r, ...timesFromLabel(r.RateLabel) })).sort((a, b) => a.RateValue - b.RateValue);
+    const off = rates[0];
+    const day = rates[rates.length - 1];
+    const offStart = toMinutes(off.start);
+    const offLength = (toMinutes(off.end) - offStart + 1440) % 1440;
+    return {
+      name: quote.TariffName,
+      exit: quote.ExitFee ? `£${quote.ExitFee} per fuel` : "No exit fees",
+      elec: {
+        standing: vatPence(elec.StandingCharge, elec.VatRate),
+        day: { price: vatPence(day.RateValue, day.VatRate), times: `${day.start} to ${day.end}` },
+        off: { price: vatPence(off.RateValue, off.VatRate), times: `${off.start} to ${off.end}` },
+        usage: elec.Eac.toLocaleString("en-GB"),
+      },
+      gas: {
+        standing: vatPence(gas.StandingCharge, gas.VatRate),
+        unit: vatPence(gas.UnitRate, gas.VatRate),
+        usage: gas.Aq.toLocaleString("en-GB"),
+      },
+      offStart,
+      offLength,
+      winter: `${off.start}–${off.end}`,
+      summer: `${toHhmm(offStart + 60)}–${toHhmm(offStart + offLength + 60)}`,
+    };
+  }
+
   function tariffScenario() {
     const id = sessionStorage.getItem(TARIFF_KEY);
     return TARIFF_SCENARIOS[id] ? id : "change";
@@ -114,6 +203,10 @@
   function tariffView() {
     const view = sessionStorage.getItem(TARIFF_VIEW_KEY);
     return view === "v2" || view === "v3" ? view : "v1";
+  }
+
+  function tariffTou() {
+    return sessionStorage.getItem(TARIFF_TYPE_KEY) === "tou" && tariffView() !== "v1";
   }
 
   function tariffDone() {
@@ -137,9 +230,12 @@
     const scenario = tariffScenario();
     const outcome = tariffOutcome();
     $$("[data-tariff-scenario]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffScenario === scenario)));
-    const fixed = tariffFixed();
-    $$("[data-tariff-type]").forEach((btn) => btn.setAttribute("aria-checked", String((btn.dataset.tariffType === "fixed") === fixed)));
     const view = tariffView();
+    const type = tariffTou() ? "tou" : tariffFixed() ? "fixed" : "variable";
+    $$("[data-tariff-type]").forEach((btn) => {
+      btn.setAttribute("aria-checked", String(btn.dataset.tariffType === type));
+      if (btn.dataset.tariffType === "tou") btn.hidden = view === "v1";
+    });
     $$("[data-tariff-view]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffView === view)));
     const note = $("[data-tariff-scenario-note]");
     if (note) note.textContent = TARIFF_NOTES[scenario];
@@ -1312,6 +1408,15 @@
         info.setAttribute("aria-expanded", String(open));
       });
     }
+    const touInfo = $("[data-tou-info]");
+    const touDialog = $("[data-tou-dialog]");
+    if (touInfo && touDialog) {
+      touInfo.addEventListener("click", () => touDialog.showModal());
+      touDialog.addEventListener("click", (e) => {
+        if (e.target === touDialog || e.target.closest("[data-tou-close]")) touDialog.close();
+      });
+      touDialog.addEventListener("close", () => touInfo.focus());
+    }
     const fuelSwitch = $("[data-fuel-switch]");
     if (fuelSwitch) {
       fuelSwitch.addEventListener("click", (e) => {
@@ -1327,7 +1432,10 @@
   function paintTariffPage() {
     const hero = $("[data-tariff-hero]");
     if (!hero) return;
-    const rateCells = $$("[data-tariff-rates] .rate-list > div:not(.rate-usage) dd").map((dd) => ({ node: dd.firstChild, text: dd.firstChild.textContent }));
+    const leadText = (el) => ({ node: el.firstChild, text: el.firstChild.textContent });
+    const rateCells = $$("[data-tariff-rates] .rate-list > div:not(.rate-usage):not(.tou-row) dd").map(leadText);
+    const usageCells = [$$("[data-tariff-rates] .rate-usage dd").map(leadText), $$("[data-tariff-usage] strong").map(leadText)];
+    const touQuote = touView(TOU_QUOTE);
     let closedDismissed = false;
     const set = (sel, text) => {
       const el = $(sel);
@@ -1378,21 +1486,72 @@
         "[data-tariff-note]",
         fixed
           ? "A fixed tariff keeps your rates the same until the end date. You pay an exit fee if you leave early."
-          : "A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee."
+          : "On a variable tariff, your energy rates and daily standing charge can change with market conditions and Ofgem’s price cap. Your bill can change even if your energy use stays the same."
       );
+      const tou = tariffTou();
+      if (tou) {
+        set("[data-tariff-chip]", "Time of use tariff");
+        set("[data-tariff-name]", touQuote.name);
+        set("[data-tenure-since]", "[start date]");
+        set("[data-tenure-length]", "[48] days left");
+        set("[data-tenure-start]", "[Start month]");
+        set("[data-tenure-end]", "[End date]");
+        set("[data-fact-end]", "[end date]");
+        set("[data-fact-exit]", touQuote.exit);
+        set("[data-tariff-note]", "A time of use tariff charges different rates for electricity at different times of day. Using more energy in the off-peak hours can lower your bill.");
+        paintTouTimes();
+      }
       const info = $("[data-tariff-info]");
-      if (info) info.setAttribute("aria-label", fixed ? "About a fixed tariff" : "About a variable tariff");
+      if (info) info.setAttribute("aria-label", tou ? "About a time of use tariff" : fixed ? "About a fixed tariff" : "About a variable tariff");
       $("[data-tariff]").classList.toggle("is-v2", view !== "v1");
       $("[data-tariff]").classList.toggle("is-v3", view === "v3");
+      $("[data-tariff]").classList.toggle("is-tou", tou);
       const tenure = $("[data-tariff-tenure]");
-      tenure.classList.toggle("is-fixed", fixed);
-      tenure.hidden = !fixed;
+      tenure.classList.toggle("is-fixed", fixed || tou);
+      tenure.hidden = !(fixed || tou);
 
       set("[data-tariff-renewed]", TARIFFS[done.renewal] ? TARIFFS[done.renewal].name : "");
       const fixedRates = [...TARIFFS.curFixed.rates.elec, ...TARIFFS.curFixed.rates.gas];
+      const touRates = [touQuote.elec.standing, null, null, touQuote.gas.standing, touQuote.gas.unit];
       rateCells.forEach(({ node, text }, i) => {
-        node.textContent = fixed && fixedRates[i] !== undefined ? `${pence(fixedRates[i])} ` : text;
+        if (tou) node.textContent = touRates[i] ? `${touRates[i]} ` : text;
+        else node.textContent = fixed ? `${pence(fixedRates[i])} ` : text;
       });
+      const touUsage = [touQuote.elec.usage, touQuote.gas.usage];
+      usageCells.forEach((cells) =>
+        cells.forEach(({ node, text }, i) => {
+          node.textContent = tou ? `${touUsage[i]} ` : text;
+        })
+      );
+    }
+
+    function paintTouTimes() {
+      ["day", "off"].forEach((band) => {
+        set(`[data-tou-times="${band}"]`, touQuote.elec[band].times);
+        const price = $(`[data-tou-price="${band}"]`);
+        if (price) price.firstChild.textContent = `${touQuote.elec[band].price} `;
+      });
+      set('[data-tou-season="winter"]', touQuote.winter);
+      set('[data-tou-season="summer"]', touQuote.summer);
+      const atPercent = (mins) => `${+((mins / 1440) * 100).toFixed(2)}%`;
+      const bar = $("[data-tou-bar]");
+      if (bar) {
+        const { offStart, offLength } = touQuote;
+        const pieces = offStart + offLength > 1440 ? [[offStart, 1440 - offStart], [0, offStart + offLength - 1440]] : [[offStart, offLength]];
+        bar.innerHTML = pieces.map(([from, width]) => `<span class="tou-bar-off" style="--from: ${atPercent(from)}; --width: ${atPercent(width)}"></span>`).join("");
+      }
+      const scale = $("[data-tou-scale]");
+      if (scale) {
+        const marks = [0, 720, 1080, 1440];
+        [touQuote.offStart, touQuote.offStart + touQuote.offLength].forEach((m) => {
+          const at = m % 1440 || (m ? 1440 : 0);
+          if (!marks.some((x) => Math.abs(x - at) < 120)) marks.push(at);
+        });
+        scale.innerHTML = marks
+          .sort((a, b) => a - b)
+          .map((m) => `<span style="--at: ${atPercent(m)}">${m === 1440 ? "24:00" : toHhmm(m)}</span>`)
+          .join("");
+      }
     }
 
     const dismiss = $("[data-tariff-dismiss-closed]");
@@ -3097,6 +3256,7 @@
         <div class="proto-choices" role="radiogroup" aria-label="Tariff type">
           <button type="button" role="radio" data-tariff-type="fixed" aria-checked="false">Fixed tariff</button>
           <button type="button" role="radio" data-tariff-type="variable" aria-checked="false">Variable tariff</button>
+          <button type="button" role="radio" data-tariff-type="tou" aria-checked="false">Time of use tariff</button>
         </div>`;
       panel.append(typeControls);
     }
@@ -3133,7 +3293,8 @@
       }
       const type = e.target.closest("[data-tariff-type]");
       if (type) {
-        if ((type.dataset.tariffType === "fixed") !== tariffFixed()) setTariffType(type.dataset.tariffType);
+        const current = tariffTou() ? "tou" : tariffFixed() ? "fixed" : "variable";
+        if (type.dataset.tariffType !== current) setTariffType(type.dataset.tariffType);
         return;
       }
       const outcome = e.target.closest("[data-tariff-outcome]");

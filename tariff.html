@@ -8,7 +8,7 @@
     <title>Your tariff · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=115" />
+    <link rel="stylesheet" href="css/styles.css?v=119" />
     <script src="js/theme.js?v=10"></script>
   </head>
   <body>
@@ -197,7 +197,7 @@
               </span>
               Electricity and gas
             </p>
-            <p class="type-note" id="tariff-type-note" data-tariff-note hidden>A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee.</p>
+            <p class="type-note" id="tariff-type-note" data-tariff-note hidden>On a variable tariff, your energy rates and daily standing charge can change with market conditions and Ofgem’s price cap. Your bill can change even if your energy use stays the same.</p>
           </div>
           <div class="tariff-tenure" data-tariff-tenure>
             <p class="tenure-head">
@@ -285,13 +285,35 @@
                   <dt>Standing charge</dt>
                   <dd>53.35p <span>per day</span></dd>
                 </div>
-                <div>
+                <div data-rate-dn>
                   <dt>Day rate</dt>
                   <dd>29.47p <span>per kWh</span></dd>
                 </div>
-                <div>
+                <div data-rate-dn>
                   <dt>Night rate</dt>
                   <dd>14.86p <span>per kWh</span></dd>
+                </div>
+                <div class="tou-row">
+                  <dt><i class="tou-key" aria-hidden="true"></i><span>Day unit rate<small data-tou-times="day">05:30 to 00:00</small></span></dt>
+                  <dd data-tou-price="day">24.50p <span>per kWh</span></dd>
+                </div>
+                <div class="tou-row">
+                  <dt><i class="tou-key is-off" aria-hidden="true"></i><span>Off-peak unit rate<small data-tou-times="off">00:00 to 05:30</small></span></dt>
+                  <dd data-tou-price="off">18.73p <span>per kWh</span></dd>
+                </div>
+                <div class="tou-row tou-clock">
+                  <dt class="sr-only">Rate times</dt>
+                  <dd>
+                    <span class="tou-bar" aria-hidden="true" data-tou-bar><span class="tou-bar-off" style="--from: 0%; --width: 22.92%"></span></span>
+                    <span class="tou-scale" aria-hidden="true" data-tou-scale>
+                      <span style="--at: 0%">00:00</span>
+                      <span style="--at: 22.92%">05:30</span>
+                      <span style="--at: 50%">12:00</span>
+                      <span style="--at: 75%">18:00</span>
+                      <span style="--at: 100%">24:00</span>
+                    </span>
+                    <span class="tou-utc">All times are in UTC.<button type="button" class="tou-info" data-tou-info aria-haspopup="dialog" aria-label="About your off-peak times"><svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" /><path d="M8 7.2V11.2M8 5h.01" /></svg></button></span>
+                  </dd>
                 </div>
                 <div class="rate-usage">
                   <dt>Estimated annual usage</dt>
@@ -495,7 +517,31 @@
       </div>
     </div>
 
+    <dialog class="tou-dialog" data-tou-dialog aria-labelledby="tou-dialog-title">
+      <div class="tou-dialog-inner">
+      <h2 id="tou-dialog-title">Your off-peak times</h2>
+      <button type="button" class="tou-dialog-close" data-tou-close aria-label="Close">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
+      </button>
+      <dl class="tou-times">
+        <div><dt>Winter (GMT)</dt><dd data-tou-season="winter">00:00–05:30</dd></div>
+        <div><dt>Summer (BST)</dt><dd data-tou-season="summer">01:00–06:30</dd></div>
+      </dl>
+      <p class="tou-dialog-copy">Your off-peak times are set in UTC, which doesn’t change when the clocks go forward or back. In summer (BST), your off-peak window is one hour later on your clock.</p>
+      <div class="tou-tip">
+        <span class="tou-tip-ico" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 20 20"><path d="M7 2.5v4M13 2.5v4M5 6.5h10v3a5 5 0 0 1-10 0z" /><path d="M10 14.5v3" /></svg>
+        </span>
+        <p>If you use a smart charger, you will need to adjust it when the clocks change to make the most of your cheaper electricity.</p>
+      </div>
+      <div class="tou-dialog-actions">
+        <button type="button" class="btn btn-secondary" data-tou-close data-demo="More about off-peak times">Click here to know more</button>
+        <button type="button" class="btn btn-primary" data-tou-close>Got it</button>
+      </div>
+      </div>
+    </dialog>
+
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=65"></script>
+    <script src="js/app.js?v=71"></script>
   </body>
 </html>
