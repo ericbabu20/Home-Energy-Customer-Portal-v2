@@ -149,27 +149,30 @@
     return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
   };
 
-  function timesFromLabel(label) {
-    const match = label.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
-    if (!match) throw new Error(`No time range in rate label: ${label}`);
-    return { start: match[1].padStart(5, "0"), end: match[2].padStart(5, "0") };
+  function timesFromLabel(label = "") {
+    const match = label.match(/(\d{1,2})[:.](\d{2})\s*(?:-|–|—|to)\s*(\d{1,2})[:.](\d{2})/i);
+    if (!match) return null;
+    const [, h1, m1, h2, m2] = match;
+    return { start: `${h1.padStart(2, "0")}:${m1}`, end: `${h2.padStart(2, "0")}:${m2}` };
   }
 
   function touView(quote) {
     const elec = quote.Electricity[0];
     const gas = quote.Gas[0];
-    const rates = elec.ElectricityRates.map((r) => ({ ...r, ...timesFromLabel(r.RateLabel) })).sort((a, b) => a.RateValue - b.RateValue);
+    const rates = elec.ElectricityRates.map((r) => ({ ...r, times: timesFromLabel(r.RateLabel) })).sort((a, b) => a.RateValue - b.RateValue);
     const off = rates[0];
     const day = rates[rates.length - 1];
-    const offStart = toMinutes(off.start);
-    const offLength = (toMinutes(off.end) - offStart + 1440) % 1440;
+    const hasTimes = Boolean(off.times && day.times);
+    const offStart = hasTimes ? toMinutes(off.times.start) : 0;
+    const offLength = hasTimes ? (toMinutes(off.times.end) - offStart + 1440) % 1440 : 0;
+    const range = (t, sep) => (hasTimes ? `${t.start}${sep}${t.end}` : "");
     return {
       name: quote.TariffName,
       exit: quote.ExitFee ? `£${quote.ExitFee} per fuel` : "No exit fees",
       elec: {
         standing: vatPence(elec.StandingCharge, elec.VatRate),
-        day: { price: vatPence(day.RateValue, day.VatRate), times: `${day.start} to ${day.end}` },
-        off: { price: vatPence(off.RateValue, off.VatRate), times: `${off.start} to ${off.end}` },
+        day: { price: vatPence(day.RateValue, day.VatRate), times: range(day.times, " to ") },
+        off: { price: vatPence(off.RateValue, off.VatRate), times: range(off.times, " to ") },
         usage: elec.Eac.toLocaleString("en-GB"),
       },
       gas: {
@@ -177,10 +180,11 @@
         unit: vatPence(gas.UnitRate, gas.VatRate),
         usage: gas.Aq.toLocaleString("en-GB"),
       },
+      hasTimes,
       offStart,
       offLength,
-      winter: `${off.start}–${off.end}`,
-      summer: `${toHhmm(offStart + 60)}–${toHhmm(offStart + offLength + 60)}`,
+      winter: range(off.times, "–"),
+      summer: hasTimes ? `${toHhmm(offStart + 60)}–${toHhmm(offStart + offLength + 60)}` : "",
     };
   }
 
@@ -1528,9 +1532,14 @@
     function paintTouTimes() {
       ["day", "off"].forEach((band) => {
         set(`[data-tou-times="${band}"]`, touQuote.elec[band].times);
+        const times = $(`[data-tou-times="${band}"]`);
+        if (times) times.hidden = !touQuote.hasTimes;
         const price = $(`[data-tou-price="${band}"]`);
         if (price) price.firstChild.textContent = `${touQuote.elec[band].price} `;
       });
+      const clock = $("[data-tou-clock]");
+      if (clock) clock.hidden = !touQuote.hasTimes;
+      if (!touQuote.hasTimes) return;
       set('[data-tou-season="winter"]', touQuote.winter);
       set('[data-tou-season="summer"]', touQuote.summer);
       const atPercent = (mins) => `${+((mins / 1440) * 100).toFixed(2)}%`;
