@@ -47,6 +47,8 @@
   const TARIFF_KEY = "he-tariff";
   const TARIFF_OUTCOME_KEY = "he-tariff-outcome";
   const TARIFF_DONE_KEY = "he-tariff-done";
+  const TARIFF_TYPE_KEY = "he-tariff-type";
+  const TARIFF_VIEW_KEY = "he-tariff-view";
   const TOAST_KEY = "he-toast";
   const TARIFF_SCENARIOS = {
     change: "Change tariff",
@@ -93,6 +95,99 @@
   const gbp = (n) => `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const pence = (n) => `${n.toFixed(2)}p`;
 
+  const TOU_QUOTE = {
+    RequestedTariffType: "Fixed + Variable",
+    RequestedFuelType: "Dual Fuel",
+    RequestedBillingType: "Standard + TOU",
+    TariffID: 1342,
+    TariffName: "My EV v8.0",
+    TariffFamilyName: "TOU",
+    TariffShortDescription: null,
+    TariffLongDescription: null,
+    BillingType: "TOU",
+    TariffType: "Smart",
+    TariffFuelType: "Dual Fuel",
+    DualFuelOnly: true,
+    IsFixed: true,
+    IsTracker: false,
+    FixedMonths: 12,
+    ExitFee: 75.0,
+    YearlyTotalExVat: 1489.0779695,
+    YearlyTotalIncVat: 1531.011492975,
+    MonthlyTotalExVat: 124.08983079166667,
+    MonthlyTotalIncVat: 127.58429108125,
+    PriceCapMaximumYearlyTotalIncVat: 0.0,
+    AnnualSaving: 0.0,
+    PercentageDifference: 0.0,
+    IsFeatured: false,
+    Electricity: [
+      {
+        Eac: 1800,
+        NightEac: 0,
+        RegionId: 11,
+        ProfileClass: "01",
+        StandingCharge: 0.5661,
+        VatRate: 1.0,
+        TotalExVat: 650.4075,
+        TotalIncVat: 650.4075,
+        ElectricityRates: [
+          { RateLabel: " Offpeak EV Rate (00:00 - 05:30) UTC", RateValue: 0.095, EacProportion: 50.0, RateEac: 900, VatRate: 1.0, TotalExVat: 85.5, TotalIncVat: 85.5 },
+          { RateLabel: "Day Rate(05:30-00:00) UTC", RateValue: 0.39809, EacProportion: 50.0, RateEac: 900, VatRate: 1.0, TotalExVat: 358.281, TotalIncVat: 358.281 },
+        ],
+      },
+    ],
+    Gas: [{ Aq: 7500, RegionId: 11, StandingCharge: 0.2801143, UnitRate: 0.0981905, VatRate: 1.05, TotalExVat: 838.6704695, TotalIncVat: 880.603992975 }],
+  };
+
+  const vatPence = (pounds, vatRate) => pence(pounds * vatRate * 100);
+  const toMinutes = (hhmm) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+  };
+  const toHhmm = (mins) => {
+    const t = ((mins % 1440) + 1440) % 1440;
+    return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+  };
+
+  function timesFromLabel(label = "") {
+    const match = label.match(/(\d{1,2})[:.](\d{2})\s*(?:-|–|—|to)\s*(\d{1,2})[:.](\d{2})/i);
+    if (!match) return null;
+    const [, h1, m1, h2, m2] = match;
+    return { start: `${h1.padStart(2, "0")}:${m1}`, end: `${h2.padStart(2, "0")}:${m2}` };
+  }
+
+  function touView(quote) {
+    const elec = quote.Electricity[0];
+    const gas = quote.Gas[0];
+    const rates = elec.ElectricityRates.map((r) => ({ ...r, times: timesFromLabel(r.RateLabel) })).sort((a, b) => a.RateValue - b.RateValue);
+    const off = rates[0];
+    const day = rates[rates.length - 1];
+    const hasTimes = Boolean(off.times && day.times);
+    const offStart = hasTimes ? toMinutes(off.times.start) : 0;
+    const offLength = hasTimes ? (toMinutes(off.times.end) - offStart + 1440) % 1440 : 0;
+    const range = (t, sep) => (hasTimes ? `${t.start}${sep}${t.end}` : "");
+    return {
+      name: quote.TariffName,
+      exit: quote.ExitFee ? `£${quote.ExitFee} per fuel` : "No exit fees",
+      elec: {
+        standing: vatPence(elec.StandingCharge, elec.VatRate),
+        day: { price: vatPence(day.RateValue, day.VatRate), times: range(day.times, " to ") },
+        off: { price: vatPence(off.RateValue, off.VatRate), times: range(off.times, " to ") },
+        usage: elec.Eac.toLocaleString("en-GB"),
+      },
+      gas: {
+        standing: vatPence(gas.StandingCharge, gas.VatRate),
+        unit: vatPence(gas.UnitRate, gas.VatRate),
+        usage: gas.Aq.toLocaleString("en-GB"),
+      },
+      hasTimes,
+      offStart,
+      offLength,
+      winter: range(off.times, "–"),
+      summer: hasTimes ? `${toHhmm(offStart + 60)}–${toHhmm(offStart + offLength + 60)}` : "",
+    };
+  }
+
   function tariffScenario() {
     const id = sessionStorage.getItem(TARIFF_KEY);
     return TARIFF_SCENARIOS[id] ? id : "change";
@@ -101,6 +196,21 @@
   function tariffOutcome() {
     const id = sessionStorage.getItem(TARIFF_OUTCOME_KEY);
     return TARIFF_OUTCOMES[tariffScenario()].some(([value]) => value === id) ? id : "ok";
+  }
+
+  function tariffFixed() {
+    const type = sessionStorage.getItem(TARIFF_TYPE_KEY);
+    if (type === "fixed" || type === "variable") return type === "fixed";
+    return tariffScenario() === "renewal" && tariffOutcome() !== "ended";
+  }
+
+  function tariffView() {
+    const view = sessionStorage.getItem(TARIFF_VIEW_KEY);
+    return view === "v2" || view === "v3" ? view : "v1";
+  }
+
+  function tariffTou() {
+    return sessionStorage.getItem(TARIFF_TYPE_KEY) === "tou" && tariffView() !== "v1";
   }
 
   function tariffDone() {
@@ -124,6 +234,13 @@
     const scenario = tariffScenario();
     const outcome = tariffOutcome();
     $$("[data-tariff-scenario]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffScenario === scenario)));
+    const view = tariffView();
+    const type = tariffTou() ? "tou" : tariffFixed() ? "fixed" : "variable";
+    $$("[data-tariff-type]").forEach((btn) => {
+      btn.setAttribute("aria-checked", String(btn.dataset.tariffType === type));
+      if (btn.dataset.tariffType === "tou") btn.hidden = view === "v1";
+    });
+    $$("[data-tariff-view]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.tariffView === view)));
     const note = $("[data-tariff-scenario-note]");
     if (note) note.textContent = TARIFF_NOTES[scenario];
     const box = $("[data-tariff-outcomes]");
@@ -146,6 +263,19 @@
     if (outcome && outcome !== "ok") sessionStorage.setItem(TARIFF_OUTCOME_KEY, outcome);
     else sessionStorage.removeItem(TARIFF_OUTCOME_KEY);
     sessionStorage.removeItem(TARIFF_DONE_KEY);
+    sessionStorage.removeItem(TARIFF_TYPE_KEY);
+    paintTariffControls();
+    tariffHooks.forEach((fn) => fn());
+  }
+
+  function setTariffType(type) {
+    sessionStorage.setItem(TARIFF_TYPE_KEY, type);
+    paintTariffControls();
+    tariffHooks.forEach((fn) => fn());
+  }
+
+  function setTariffView(view) {
+    sessionStorage.setItem(TARIFF_VIEW_KEY, view);
     paintTariffControls();
     tariffHooks.forEach((fn) => fn());
   }
@@ -552,6 +682,9 @@
       showAddress(input.dataset.full);
       const accountEl = $("[data-account]");
       if (accountEl) accountEl.textContent = input.dataset.account;
+      $$("[data-account-number]").forEach((el) => {
+        el.textContent = input.dataset.account;
+      });
       const copy = $("[data-copy]");
       if (copy) copy.dataset.copy = input.dataset.account;
       $$(".address-option", dialog).forEach((label) => {
@@ -1279,13 +1412,34 @@
         info.setAttribute("aria-expanded", String(open));
       });
     }
+    const touInfo = $("[data-tou-info]");
+    const touDialog = $("[data-tou-dialog]");
+    if (touInfo && touDialog) {
+      touInfo.addEventListener("click", () => touDialog.showModal());
+      touDialog.addEventListener("click", (e) => {
+        if (e.target === touDialog || e.target.closest("[data-tou-close]")) touDialog.close();
+      });
+      touDialog.addEventListener("close", () => touInfo.focus());
+    }
+    const fuelSwitch = $("[data-fuel-switch]");
+    if (fuelSwitch) {
+      fuelSwitch.addEventListener("click", (e) => {
+        const choice = e.target.closest("[data-fuel-value]");
+        if (!choice) return;
+        $("[data-tariff]").dataset.fuelView = choice.dataset.fuelValue;
+        $$("[data-fuel-value]", fuelSwitch).forEach((btn) => btn.setAttribute("aria-checked", String(btn === choice)));
+      });
+    }
     paintTariffPage();
   }
 
   function paintTariffPage() {
     const hero = $("[data-tariff-hero]");
     if (!hero) return;
-    const rateCells = $$("[data-tariff-rates] .rate-list dd").map((dd) => ({ node: dd.firstChild, text: dd.firstChild.textContent }));
+    const leadText = (el) => ({ node: el.firstChild, text: el.firstChild.textContent });
+    const rateCells = $$("[data-tariff-rates] .rate-list > div:not(.rate-usage):not(.tou-row) dd").map(leadText);
+    const usageCells = [$$("[data-tariff-rates] .rate-usage dd").map(leadText), $$("[data-tariff-usage] strong").map(leadText)];
+    const touQuote = touView(TOU_QUOTE);
     let closedDismissed = false;
     const set = (sel, text) => {
       const el = $(sel);
@@ -1297,20 +1451,25 @@
       const outcome = tariffOutcome();
       const done = tariffDone();
       const renewal = scenario === "renewal";
-      const fixed = renewal && outcome !== "ended";
+      const fixed = tariffFixed();
       const ddDone = scenario === "pob" && Boolean(done.dd);
       const closed = renewal && outcome === "closed" && done.closed;
       const show = {
         closed: closed && !closedDismissed,
         ended: renewal && outcome === "ended",
-        renew: fixed && !done.renewal && !closed && outcome !== "noOptions",
+        renew: renewal && fixed && !done.renewal && !closed && outcome !== "noOptions",
         "renew-done": renewal && Boolean(done.renewal),
         "no-options": renewal && outcome === "noOptions" && !done.renewal,
         "pay-link": scenario === "pob" && !ddDone,
         promo: scenario === "pob" && !ddDone,
-        compare: scenario === "change" || (renewal && (outcome === "ended" || closed)),
         entry: scenario === "change" || (renewal && (outcome === "ended" || closed)),
       };
+      const view = tariffView();
+      if (view === "v3") {
+        ["closed", "renew", "no-options", "pay-link", "promo", "entry"].forEach((key) => {
+          show[key] = false;
+        });
+      }
       $$("[data-tariff-show]").forEach((el) => {
         el.hidden = !show[el.dataset.tariffShow];
       });
@@ -1331,17 +1490,77 @@
         "[data-tariff-note]",
         fixed
           ? "A fixed tariff keeps your rates the same until the end date. You pay an exit fee if you leave early."
-          : "A variable tariff can go up or down when energy prices change. This one has no end date and no exit fee."
+          : "On a variable tariff, your energy rates and daily standing charge can change with market conditions and Ofgem’s price cap. Your bill can change even if your energy use stays the same."
       );
+      const tou = tariffTou();
+      if (tou) {
+        set("[data-tariff-chip]", "Time of use tariff");
+        set("[data-tariff-name]", touQuote.name);
+        set("[data-tenure-since]", "[start date]");
+        set("[data-tenure-length]", "[48] days left");
+        set("[data-tenure-start]", "[Start month]");
+        set("[data-tenure-end]", "[End date]");
+        set("[data-fact-end]", "[end date]");
+        set("[data-fact-exit]", touQuote.exit);
+        set("[data-tariff-note]", "A time of use tariff charges different rates for electricity at different times of day. Using more energy in the off-peak hours can lower your bill.");
+        paintTouTimes();
+      }
       const info = $("[data-tariff-info]");
-      if (info) info.setAttribute("aria-label", fixed ? "About a fixed tariff" : "About a variable tariff");
-      $("[data-tariff-tenure]").classList.toggle("is-fixed", fixed);
+      if (info) info.setAttribute("aria-label", tou ? "About a time of use tariff" : fixed ? "About a fixed tariff" : "About a variable tariff");
+      $("[data-tariff]").classList.toggle("is-v2", view !== "v1");
+      $("[data-tariff]").classList.toggle("is-v3", view === "v3");
+      $("[data-tariff]").classList.toggle("is-tou", tou);
+      const tenure = $("[data-tariff-tenure]");
+      tenure.classList.toggle("is-fixed", fixed || tou);
+      tenure.hidden = !(fixed || tou);
 
       set("[data-tariff-renewed]", TARIFFS[done.renewal] ? TARIFFS[done.renewal].name : "");
       const fixedRates = [...TARIFFS.curFixed.rates.elec, ...TARIFFS.curFixed.rates.gas];
+      const touRates = [touQuote.elec.standing, null, null, touQuote.gas.standing, touQuote.gas.unit];
       rateCells.forEach(({ node, text }, i) => {
-        node.textContent = fixed && fixedRates[i] !== undefined ? `${pence(fixedRates[i])} ` : text;
+        if (tou) node.textContent = touRates[i] ? `${touRates[i]} ` : text;
+        else node.textContent = fixed ? `${pence(fixedRates[i])} ` : text;
       });
+      const touUsage = [touQuote.elec.usage, touQuote.gas.usage];
+      usageCells.forEach((cells) =>
+        cells.forEach(({ node, text }, i) => {
+          node.textContent = tou ? `${touUsage[i]} ` : text;
+        })
+      );
+    }
+
+    function paintTouTimes() {
+      ["day", "off"].forEach((band) => {
+        set(`[data-tou-times="${band}"]`, touQuote.elec[band].times);
+        const times = $(`[data-tou-times="${band}"]`);
+        if (times) times.hidden = !touQuote.hasTimes;
+        const price = $(`[data-tou-price="${band}"]`);
+        if (price) price.firstChild.textContent = `${touQuote.elec[band].price} `;
+      });
+      const clock = $("[data-tou-clock]");
+      if (clock) clock.hidden = !touQuote.hasTimes;
+      if (!touQuote.hasTimes) return;
+      set('[data-tou-season="winter"]', touQuote.winter);
+      set('[data-tou-season="summer"]', touQuote.summer);
+      const atPercent = (mins) => `${+((mins / 1440) * 100).toFixed(2)}%`;
+      const bar = $("[data-tou-bar]");
+      if (bar) {
+        const { offStart, offLength } = touQuote;
+        const pieces = offStart + offLength > 1440 ? [[offStart, 1440 - offStart], [0, offStart + offLength - 1440]] : [[offStart, offLength]];
+        bar.innerHTML = pieces.map(([from, width]) => `<span class="tou-bar-off" style="--from: ${atPercent(from)}; --width: ${atPercent(width)}"></span>`).join("");
+      }
+      const scale = $("[data-tou-scale]");
+      if (scale) {
+        const marks = [0, 720, 1080, 1440];
+        [touQuote.offStart, touQuote.offStart + touQuote.offLength].forEach((m) => {
+          const at = m % 1440 || (m ? 1440 : 0);
+          if (!marks.some((x) => Math.abs(x - at) < 120)) marks.push(at);
+        });
+        scale.innerHTML = marks
+          .sort((a, b) => a - b)
+          .map((m) => `<span style="--at: ${atPercent(m)}">${m === 1440 ? "24:00" : toHhmm(m)}</span>`)
+          .join("");
+      }
     }
 
     const dismiss = $("[data-tariff-dismiss-closed]");
@@ -3008,6 +3227,17 @@
     const toggle = $("[data-proto-toggle]");
     const menu = $(".proto-menu");
     if (!panel || !toggle || !menu) return;
+    if ($("[data-account-menu]")) {
+      const accountControls = document.createElement("div");
+      accountControls.className = "proto-group";
+      accountControls.innerHTML = `
+        <p class="proto-note">Account button</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Account button">
+          <button type="button" role="radio" data-account-mode="menu" aria-checked="false">Account menu</button>
+          <button type="button" role="radio" data-account-mode="signout" aria-checked="false">Sign out only</button>
+        </div>`;
+      panel.append(accountControls);
+    }
     const tariffControls = document.createElement("div");
     tariffControls.className = "proto-group";
     tariffControls.innerHTML = `
@@ -3021,6 +3251,24 @@
       <p class="proto-note">Tariff outcome</p>
       <div class="proto-choices" role="radiogroup" aria-label="Tariff outcome" data-tariff-outcomes></div>
       <button type="button" class="link-btn" data-tariff-reset>Reset tariff journeys</button>`;
+    if ($("[data-tariff-hero]")) {
+      const typeControls = document.createElement("div");
+      typeControls.className = "proto-group";
+      typeControls.innerHTML = `
+        <p class="proto-note">Page version</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Page version">
+          <button type="button" role="radio" data-tariff-view="v1" aria-checked="false">Version 1</button>
+          <button type="button" role="radio" data-tariff-view="v2" aria-checked="false">Version 2</button>
+          <button type="button" role="radio" data-tariff-view="v3" aria-checked="false">Version 3</button>
+        </div>
+        <p class="proto-note">Tariff type</p>
+        <div class="proto-choices" role="radiogroup" aria-label="Tariff type">
+          <button type="button" role="radio" data-tariff-type="fixed" aria-checked="false">Fixed tariff</button>
+          <button type="button" role="radio" data-tariff-type="variable" aria-checked="false">Variable tariff</button>
+          <button type="button" role="radio" data-tariff-type="tou" aria-checked="false">Time of use tariff</button>
+        </div>`;
+      panel.append(typeControls);
+    }
     panel.append(tariffControls);
     function setOpen(open) {
       panel.hidden = !open;
@@ -3036,9 +3284,26 @@
         setCustomer(choice.dataset.customer);
         return;
       }
+      const accountMode = e.target.closest("[data-account-mode]");
+      if (accountMode) {
+        sessionStorage.setItem(ACCOUNT_MENU_KEY, accountMode.dataset.accountMode);
+        paintAccountMenu();
+        return;
+      }
       const scenario = e.target.closest("[data-tariff-scenario]");
       if (scenario) {
         if (scenario.dataset.tariffScenario !== tariffScenario()) changeTariffPrototype(scenario.dataset.tariffScenario);
+        return;
+      }
+      const view = e.target.closest("[data-tariff-view]");
+      if (view) {
+        if (view.dataset.tariffView !== tariffView()) setTariffView(view.dataset.tariffView);
+        return;
+      }
+      const type = e.target.closest("[data-tariff-type]");
+      if (type) {
+        const current = tariffTou() ? "tou" : tariffFixed() ? "fixed" : "variable";
+        if (type.dataset.tariffType !== current) setTariffType(type.dataset.tariffType);
         return;
       }
       const outcome = e.target.closest("[data-tariff-outcome]");
@@ -3058,6 +3323,74 @@
     });
     paintCustomer();
     paintTariffControls();
+    paintAccountMenu();
+  }
+
+  /* ---------- Account menu (header avatar) ---------- */
+
+  const ACCOUNT_MENU_KEY = "he-account-menu";
+
+  function accountMenuOff() {
+    return sessionStorage.getItem(ACCOUNT_MENU_KEY) === "signout";
+  }
+
+  function paintAccountMenu() {
+    const off = accountMenuOff();
+    document.documentElement.classList.toggle("account-menu-off", off);
+    $$("[data-account-mode]").forEach((btn) => btn.setAttribute("aria-checked", String((btn.dataset.accountMode === "signout") === off)));
+    const toggle = $("[data-account-toggle]");
+    if (!toggle) return;
+    toggle.setAttribute("aria-label", off ? "Sign out of Keith Bastian's account" : "Account menu for Keith Bastian");
+    if (off) {
+      toggle.title = "Sign out";
+      toggle.removeAttribute("aria-expanded");
+      $("[data-account-pop]").hidden = true;
+    } else {
+      toggle.removeAttribute("title");
+      toggle.setAttribute("aria-expanded", String(!$("[data-account-pop]").hidden));
+    }
+  }
+
+  function initAccountMenu() {
+    const wrap = $("[data-account-menu]");
+    if (!wrap) return;
+    const toggle = $("[data-account-toggle]", wrap);
+    const pop = $("[data-account-pop]", wrap);
+    const setOpen = (open) => {
+      pop.hidden = !open;
+      toggle.setAttribute("aria-expanded", String(open));
+    };
+    toggle.addEventListener("click", () => {
+      if (accountMenuOff()) {
+        session.end();
+        location.href = "index.html";
+        return;
+      }
+      const open = pop.hidden;
+      setOpen(open);
+      if (open) $(".account-pop-item", pop).focus();
+    });
+    document.addEventListener("click", (e) => {
+      if (!pop.hidden && !wrap.contains(e.target)) setOpen(false);
+    });
+    pop.addEventListener("click", (e) => {
+      if (e.target.closest(".account-pop-item")) setOpen(false);
+    });
+    wrap.addEventListener("focusout", (e) => {
+      if (!pop.hidden && e.relatedTarget && !wrap.contains(e.relatedTarget)) setOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !pop.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    if (/\/account\.html$/.test(location.pathname)) {
+      $$('a[href="account.html"]', document).forEach((link) => {
+        if (link.closest("[data-account-pop], [data-account-new]")) link.setAttribute("aria-current", "page");
+      });
+    }
+    paintAccountMenu();
   }
 
   function initPortal() {
@@ -3074,6 +3407,7 @@
     initHeaderEdge();
     initTips();
     initCopy();
+    initAccountMenu();
     initPrototype();
     initTariffJourney();
     initHomeTariff();
@@ -3099,6 +3433,7 @@
   /* ---------- Your account ---------- */
 
   const ACCOUNT_KEY = "he-account-v2";
+  const ACCOUNT_LAYOUT_KEY = "he-account-layout";
   const PSR_NEEDS = [
     "Age-related support",
     "Hearing loss",
@@ -3169,19 +3504,42 @@
 
     /* Pages on mobile */
 
+    /* Version 2 on desktop: overview tiles, each section opens in a side panel */
+    const overview = () => !mobile.matches && sessionStorage.getItem(ACCOUNT_LAYOUT_KEY) === "v2";
+    const drawerOutside = () => [$("[data-header]"), $(".side-nav"), $("[data-acct-profile]", root), $("[data-acct-overview]", root), $(".acct-title", root)];
+
     function page() {
       const id = location.hash.slice(1);
-      if (!mobile.matches || !ACCOUNT_PAGES.includes(id)) return "menu";
-      return id === "smart" && !isSmart() ? "menu" : id;
+      const valid = ACCOUNT_PAGES.includes(id) && !(id === "smart" && !isSmart());
+      if (overview()) return valid ? id : "overview";
+      return mobile.matches && valid ? id : "menu";
     }
 
     function paintPage() {
       const current = page();
+      const isOverview = overview();
+      const drawer = isOverview && current !== "overview";
+      root.classList.toggle("is-overview", isOverview);
       root.dataset.acctPage = current;
-      $("[data-acct-back]", root).hidden = current === "menu";
+      document.documentElement.classList.toggle("acct-drawer-open", drawer);
+      drawerOutside().forEach((el) => el && (el.inert = drawer));
+      $("[data-acct-back]", root).hidden = current === "menu" || isOverview;
       $$("[data-acct-card]", root).forEach((card) => card.classList.toggle("is-current", card.dataset.acctCard === current));
       if (current === lastPage) return;
       if (editing) cancelEdit();
+      if (isOverview) {
+        if (drawer) {
+          $(".acct-grid", root).scrollTop = 0;
+          const heading = $(`[data-acct-card="${current}"] h2`, root);
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        } else {
+          const tile = $(`.acct-tile[href="#${lastPage}"]`, root);
+          if (tile) tile.focus();
+        }
+        lastPage = current;
+        return;
+      }
       window.scrollTo(0, 0);
       if (current === "menu") {
         const row = $(`.acct-row[href="#${lastPage}"]`, root);
@@ -3207,8 +3565,8 @@
 
     function paintValues() {
       $$("[data-acct-value]", root).forEach((el) => (el.textContent = state.contact[el.dataset.acctValue] || "Not provided"));
-      $("[data-acct-username]", root).textContent = state.username;
-      $("[data-acct-freq]", root).textContent = READING_FREQ[state.freq];
+      $$("[data-acct-username]", root).forEach((el) => (el.textContent = state.username));
+      $$("[data-acct-freq]", root).forEach((el) => (el.textContent = READING_FREQ[state.freq]));
       $$("[data-acct-smart-only]", root).forEach((el) => (el.hidden = !isSmart()));
     }
 
@@ -3219,7 +3577,7 @@
         btn.setAttribute("aria-disabled", String(editing !== "marketing"));
       });
       const count = Object.values(prefs).filter(Boolean).length;
-      $("[data-acct-optin]", root).textContent = `${count} of 3 opted in`;
+      $$("[data-acct-optin]", root).forEach((el) => (el.textContent = `${count} of 3 opted in`));
       $("[data-acct-mkt-none]", root).hidden = !(editing === "marketing" && count === 0);
     }
 
@@ -3667,6 +4025,17 @@
     );
 
     root.addEventListener("click", (e) => {
+      const tile = e.target.closest(".acct-tile");
+      if (tile) {
+        e.preventDefault();
+        history.pushState({ acct: true }, "", tile.getAttribute("href"));
+        paintPage();
+        return;
+      }
+      if (e.target.closest("[data-acct-close]")) {
+        goBack();
+        return;
+      }
       const row = e.target.closest(".acct-row");
       if (row && mobile.matches) {
         e.preventDefault();
@@ -3681,7 +4050,10 @@
       const contactLink = e.target.closest("[data-acct-contact-link]");
       if (contactLink) {
         e.preventDefault();
-        if (mobile.matches) {
+        if (overview()) {
+          history.replaceState(history.state, "", "#contactus");
+          paintPage();
+        } else if (mobile.matches) {
           history.pushState({ acct: true }, "", "#contactus");
           paintPage();
         } else {
@@ -3738,6 +4110,9 @@
     window.addEventListener("popstate", paintPage);
     window.addEventListener("hashchange", paintPage);
     mobile.addEventListener("change", paintPage);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overview() && page() !== "overview" && !dialog.open) goBack();
+    });
 
     /* Prototype controls */
 
@@ -3746,6 +4121,11 @@
     proto.className = "proto-group";
     proto.innerHTML = `
       <p class="proto-note">Your account</p>
+      <div class="proto-choices" role="radiogroup" aria-label="Your account version">
+        <button type="button" role="radio" data-acct-layout="v1" aria-checked="false">Version 1</button>
+        <button type="button" role="radio" data-acct-layout="v2" aria-checked="false">Version 2</button>
+      </div>
+      <p class="proto-note">Version 2 shows every section as a tile on desktop and opens it in a side panel. Mobile is the same in both.</p>
       <label class="proto-check"><input type="checkbox" data-acct-proto="dd" />Direct Debit set up</label>
       <label class="proto-check"><input type="checkbox" data-acct-proto="psr" />On the Priority Services Register</label>
       <label class="proto-check"><input type="checkbox" data-acct-proto="fail" />Simulate save failure</label>
@@ -3756,6 +4136,8 @@
     function paintProto() {
       const values = { dd: ddSet(), psr: state.psr.reg, fail: state.fail };
       $$("[data-acct-proto]", proto).forEach((box) => (box.checked = values[box.dataset.acctProto]));
+      const layout = sessionStorage.getItem(ACCOUNT_LAYOUT_KEY) === "v2" ? "v2" : "v1";
+      $$("[data-acct-layout]", proto).forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.acctLayout === layout)));
     }
 
     proto.addEventListener("change", (e) => {
@@ -3768,6 +4150,13 @@
     });
 
     proto.addEventListener("click", (e) => {
+      const layoutBtn = e.target.closest("[data-acct-layout]");
+      if (layoutBtn) {
+        sessionStorage.setItem(ACCOUNT_LAYOUT_KEY, layoutBtn.dataset.acctLayout);
+        paintProto();
+        paintPage();
+        return;
+      }
       if (!e.target.closest("[data-acct-proto-reset]")) return;
       state = accountDefaults();
       save();
@@ -3793,9 +4182,43 @@
     });
   }
 
+  function initChat() {
+    const panel = $("[data-chat-panel]");
+    const open = $("[data-chat-open]");
+    if (!panel || !open) return;
+    const input = $("#chat-message", panel);
+    function setOpen(show) {
+      panel.hidden = !show;
+      open.setAttribute("aria-expanded", String(show));
+      (show ? input : open).focus();
+    }
+    open.addEventListener("click", () => setOpen(true));
+    $$("[data-chat-link]").forEach((link) =>
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        $("[data-menu-close]")?.click();
+        setOpen(true);
+      })
+    );
+    if (location.hash === "#chat") {
+      history.replaceState(null, "", location.pathname + location.search);
+      setOpen(true);
+    }
+    $("[data-chat-close]", panel).addEventListener("click", () => setOpen(false));
+    panel.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setOpen(false);
+    });
+    $("[data-chat-form]", panel).addEventListener("submit", (e) => {
+      e.preventDefault();
+      input.value = "";
+      toast("Live chat isn't part of this demo yet");
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initDemoActions();
+    initChat();
     initLogin();
     initPortal();
   });

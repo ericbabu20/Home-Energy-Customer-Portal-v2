@@ -8,7 +8,7 @@
     <title>Your account · Home Energy</title>
     <link rel="preload" href="assets/fonts/figtree-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="assets/fonts/young-serif-latin.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="css/styles.css?v=83" />
+    <link rel="stylesheet" href="css/styles.css?v=119" />
     <script src="js/theme.js?v=10"></script>
   </head>
   <body>
@@ -54,7 +54,31 @@
           </button>
         </div>
 
-        <button type="button" class="avatar" data-sign-out title="Sign out" aria-label="Sign out of Keith Bastian's account">KB</button>
+        <div class="account-menu" data-account-menu>
+          <button type="button" class="avatar" data-account-toggle aria-expanded="false" aria-controls="account-pop" aria-label="Account menu for Keith Bastian">KB</button>
+          <section class="account-pop" id="account-pop" data-account-pop hidden tabindex="-1" aria-label="Account">
+            <div class="account-pop-head">
+              <span class="account-pop-avatar" aria-hidden="true">KB</span>
+              <span class="account-pop-who"><b>Keith Bastian</b><span>Account <span data-account-number>HE0365222</span></span></span>
+            </div>
+            <div class="account-pop-group">
+              <a class="account-pop-item" href="account.html">
+                <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="6" r="3.5" /><path d="M2.5 17a6.5 6.5 0 0 1 13 0" /></svg>
+                My account
+              </a>
+              <a class="account-pop-item" href="portal.html#chat" data-chat-link>
+                <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" /></svg>
+                Chat with us
+              </a>
+            </div>
+            <div class="account-pop-group">
+              <button type="button" class="account-pop-item" data-sign-out>
+                <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 2.5H4A1.5 1.5 0 0 0 2.5 4v10A1.5 1.5 0 0 0 4 15.5h3" /><path d="M11.5 5.5 15 9l-3.5 3.5M15 9H7" /></svg>
+                Sign out
+              </button>
+            </div>
+          </section>
+        </div>
 
         <button type="button" class="menu-trigger" data-menu-open aria-haspopup="dialog" aria-controls="menu-sheet" aria-expanded="false">
           Menu
@@ -99,6 +123,10 @@
         <a class="nav-item" href="#" data-demo="Help and support">
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
           Help &amp; support
+        </a>
+        <a class="nav-item" href="portal.html#chat" data-chat-link>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" /></svg>
+          Chat with us
         </a>
       </nav>
 
@@ -206,7 +234,117 @@
           </ul>
         </div>
 
+        <section class="acct-ov-profile" data-acct-profile aria-label="Account holder">
+          <span class="acct-ov-avatar" aria-hidden="true">KB</span>
+          <div class="acct-ov-who">
+            <h2 data-acct-value="name">Keith Bastian</h2>
+            <p><span data-account-number>HE0365222</span> · <span data-site-address>Flat 2, Sandon Brook Manor, Sandon Brook Place, Sandon, Chelmsford, CM2 7UJ</span></p>
+          </div>
+        </section>
+
+        <div class="acct-overview" data-acct-overview>
+          <h2 class="acct-ov-title" id="acct-ov-account">Account</h2>
+          <ul class="acct-tiles" aria-labelledby="acct-ov-account">
+            <li>
+              <a class="acct-tile" href="#login">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><rect x="3.5" y="8.5" width="13" height="9" rx="2" /><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5" /></svg></span>
+                <b>Login details</b>
+                <span class="acct-tile-sum" data-acct-username>keith.bastian@gmail.com</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#contact">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><rect x="3.5" y="3" width="13" height="15" rx="2" /><circle cx="10" cy="9" r="2.2" /><path d="M6.5 15a3.5 3.5 0 0 1 7 0" /></svg></span>
+                <b>Contact details</b>
+                <span class="acct-tile-sum"><span data-acct-value="email"></span><span data-acct-value="mobile"></span></span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#billing">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M10 18s6-5.5 6-10a6 6 0 0 0-12 0c0 4.5 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></svg></span>
+                <b>Billing address</b>
+                <span class="acct-tile-sum"><span>42 Oak Tree Lane, Flat 3</span><span>Manchester, M1 1AE</span></span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#dd">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><rect x="2.5" y="4.5" width="15" height="11" rx="2" /><path d="M2.5 8.5h15" /></svg></span>
+                <b>Direct Debit details</b>
+                <span class="acct-tile-sum" data-acct-dd="set"><span>Ending •••• <span data-acct-dd-value="last4"></span></span><span data-acct-dd-value="day"></span></span>
+                <span class="acct-tile-sum" data-acct-dd="none" hidden>No Direct Debit set up</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+
+          <h2 class="acct-ov-title" id="acct-ov-support">Support and preferences</h2>
+          <ul class="acct-tiles" aria-labelledby="acct-ov-support">
+            <li>
+              <a class="acct-tile" href="#psr">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M10 17s-7-4.2-7-9a3.8 3.8 0 0 1 7-2 3.8 3.8 0 0 1 7 2c0 4.8-7 9-7 9z" /></svg></span>
+                <b>Priority Services Register</b>
+                <span class="acct-tile-sum"><span class="acct-pill is-ok" data-acct-psr="yes">Registered</span><span class="acct-pill" data-acct-psr="no" hidden>Not registered</span></span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#marketing">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M3 8v4h3l8 4V4L6 8z" /></svg></span>
+                <b>Marketing preferences</b>
+                <span class="acct-tile-sum" data-acct-optin>2 of 3 opted in</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li data-acct-smart-only>
+              <a class="acct-tile" href="#smart">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M2.5 15a7.5 7.5 0 0 1 15 0" /><line x1="10" y1="15" x2="13" y2="9" /></svg></span>
+                <b>Smart meter preferences</b>
+                <span class="acct-tile-sum"><span>Reading frequency: <span data-acct-freq></span></span></span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#support">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" /><circle cx="10" cy="10" r="3" /><path d="M4.7 4.7l3 3M12.3 12.3l3 3M15.3 4.7l-3 3M7.7 12.3l-3 3" /></svg></span>
+                <b>Additional support</b>
+                <span class="acct-tile-sum">Extra help and services for your household</span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+
+          <h2 class="acct-ov-title" id="acct-ov-help">Help</h2>
+          <ul class="acct-tiles" aria-labelledby="acct-ov-help">
+            <li>
+              <a class="acct-tile" href="#contactus">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><path d="M4 2.5h3l1.5 4-2 1.3a9 9 0 0 0 5.7 5.7l1.3-2 4 1.5v3a1.5 1.5 0 0 1-1.6 1.5A15 15 0 0 1 2.5 4.1 1.5 1.5 0 0 1 4 2.5z" /></svg></span>
+                <b>Contact us</b>
+                <span class="acct-tile-sum"><span>Call us [Phone number]</span><span>[Opening hours]</span></span>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+            <li>
+              <a class="acct-tile" href="#faqs">
+                <span class="acct-tile-ico" aria-hidden="true"><svg class="icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" /><path d="M7.8 7.8a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.5v.4" /><circle cx="10" cy="14.3" r=".9" fill="currentColor" stroke="none" /></svg></span>
+                <b>FAQs</b>
+                <svg class="icon chev" viewBox="0 0 7 12" aria-hidden="true"><polyline points="1,1 6,6 1,11" /></svg>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="acct-scrim" data-acct-close></div>
+
         <div class="acct-grid">
+          <div class="acct-drawer-bar">
+            <span>Your account</span>
+            <button type="button" class="acct-drawer-close" data-acct-close aria-label="Close">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
+            </button>
+          </div>
           <section class="acct-card" data-acct-card="contact" aria-labelledby="acct-contact-title">
             <div class="acct-card-head"><h2 id="acct-contact-title">Contact details</h2></div>
             <div class="acct-view" data-acct-view="contact">
@@ -490,6 +628,11 @@
         </button>
       </div>
 
+      <a class="sheet-account" href="account.html" data-account-new>
+        <span class="sheet-account-avatar" aria-hidden="true">KB</span>
+        <span class="sheet-account-who"><b>Keith Bastian</b><span>My account · <span data-account-number>HE0365222</span></span></span>
+        <svg class="icon chev" viewBox="0 0 10 16" aria-hidden="true"><polyline points="2,2 8,8 2,14" /></svg>
+      </a>
       <nav aria-label="Account sections">
         <a class="nav-item nav-book" href="booking.html">
           <span class="nav-new">New</span>
@@ -524,6 +667,10 @@
           <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 11V9a6.5 6.5 0 0 1 13 0v2" /><rect x="1.5" y="10" width="3.5" height="5" rx="1.2" /><rect x="13" y="10" width="3.5" height="5" rx="1.2" /></svg>
           Help &amp; support
         </a>
+        <a class="nav-item" href="portal.html#chat" data-chat-link>
+          <svg class="icon" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" /></svg>
+          Chat with us
+        </a>
       </nav>
 
       <div class="sheet-section">
@@ -535,7 +682,7 @@
       </div>
 
       <div class="sheet-section">
-        <span class="cap">Signed in as Keith Bastian</span>
+        <span class="cap" data-account-old>Signed in as Keith Bastian</span>
         <button type="button" class="btn btn-secondary btn-block" data-sign-out>Sign out</button>
       </div>
     </div>
@@ -591,6 +738,6 @@
     </div>
 
     <div class="toast" role="status" aria-live="polite" data-toast></div>
-    <script src="js/app.js?v=53"></script>
+    <script src="js/app.js?v=72"></script>
   </body>
 </html>
