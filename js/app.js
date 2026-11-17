@@ -3263,6 +3263,7 @@
   /* ---------- Your account ---------- */
 
   const ACCOUNT_KEY = "he-account-v2";
+  const ACCOUNT_LAYOUT_KEY = "he-account-layout";
   const PSR_NEEDS = [
     "Age-related support",
     "Hearing loss",
@@ -3333,19 +3334,42 @@
 
     /* Pages on mobile */
 
+    /* Version 2 on desktop: overview tiles, each section opens in a side panel */
+    const overview = () => !mobile.matches && sessionStorage.getItem(ACCOUNT_LAYOUT_KEY) === "v2";
+    const drawerOutside = () => [$("[data-header]"), $(".side-nav"), $("[data-acct-profile]", root), $("[data-acct-overview]", root), $(".acct-title", root)];
+
     function page() {
       const id = location.hash.slice(1);
-      if (!mobile.matches || !ACCOUNT_PAGES.includes(id)) return "menu";
-      return id === "smart" && !isSmart() ? "menu" : id;
+      const valid = ACCOUNT_PAGES.includes(id) && !(id === "smart" && !isSmart());
+      if (overview()) return valid ? id : "overview";
+      return mobile.matches && valid ? id : "menu";
     }
 
     function paintPage() {
       const current = page();
+      const isOverview = overview();
+      const drawer = isOverview && current !== "overview";
+      root.classList.toggle("is-overview", isOverview);
       root.dataset.acctPage = current;
-      $("[data-acct-back]", root).hidden = current === "menu";
+      document.documentElement.classList.toggle("acct-drawer-open", drawer);
+      drawerOutside().forEach((el) => el && (el.inert = drawer));
+      $("[data-acct-back]", root).hidden = current === "menu" || isOverview;
       $$("[data-acct-card]", root).forEach((card) => card.classList.toggle("is-current", card.dataset.acctCard === current));
       if (current === lastPage) return;
       if (editing) cancelEdit();
+      if (isOverview) {
+        if (drawer) {
+          $(".acct-grid", root).scrollTop = 0;
+          const heading = $(`[data-acct-card="${current}"] h2`, root);
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        } else {
+          const tile = $(`.acct-tile[href="#${lastPage}"]`, root);
+          if (tile) tile.focus();
+        }
+        lastPage = current;
+        return;
+      }
       window.scrollTo(0, 0);
       if (current === "menu") {
         const row = $(`.acct-row[href="#${lastPage}"]`, root);
@@ -3371,8 +3395,8 @@
 
     function paintValues() {
       $$("[data-acct-value]", root).forEach((el) => (el.textContent = state.contact[el.dataset.acctValue] || "Not provided"));
-      $("[data-acct-username]", root).textContent = state.username;
-      $("[data-acct-freq]", root).textContent = READING_FREQ[state.freq];
+      $$("[data-acct-username]", root).forEach((el) => (el.textContent = state.username));
+      $$("[data-acct-freq]", root).forEach((el) => (el.textContent = READING_FREQ[state.freq]));
       $$("[data-acct-smart-only]", root).forEach((el) => (el.hidden = !isSmart()));
     }
 
@@ -3383,7 +3407,7 @@
         btn.setAttribute("aria-disabled", String(editing !== "marketing"));
       });
       const count = Object.values(prefs).filter(Boolean).length;
-      $("[data-acct-optin]", root).textContent = `${count} of 3 opted in`;
+      $$("[data-acct-optin]", root).forEach((el) => (el.textContent = `${count} of 3 opted in`));
       $("[data-acct-mkt-none]", root).hidden = !(editing === "marketing" && count === 0);
     }
 
@@ -3831,6 +3855,17 @@
     );
 
     root.addEventListener("click", (e) => {
+      const tile = e.target.closest(".acct-tile");
+      if (tile) {
+        e.preventDefault();
+        history.pushState({ acct: true }, "", tile.getAttribute("href"));
+        paintPage();
+        return;
+      }
+      if (e.target.closest("[data-acct-close]")) {
+        goBack();
+        return;
+      }
       const row = e.target.closest(".acct-row");
       if (row && mobile.matches) {
         e.preventDefault();
@@ -3845,7 +3880,10 @@
       const contactLink = e.target.closest("[data-acct-contact-link]");
       if (contactLink) {
         e.preventDefault();
-        if (mobile.matches) {
+        if (overview()) {
+          history.replaceState(history.state, "", "#contactus");
+          paintPage();
+        } else if (mobile.matches) {
           history.pushState({ acct: true }, "", "#contactus");
           paintPage();
         } else {
@@ -3902,6 +3940,9 @@
     window.addEventListener("popstate", paintPage);
     window.addEventListener("hashchange", paintPage);
     mobile.addEventListener("change", paintPage);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overview() && page() !== "overview" && !dialog.open) goBack();
+    });
 
     /* Prototype controls */
 
@@ -3910,6 +3951,11 @@
     proto.className = "proto-group";
     proto.innerHTML = `
       <p class="proto-note">Your account</p>
+      <div class="proto-choices" role="radiogroup" aria-label="Your account version">
+        <button type="button" role="radio" data-acct-layout="v1" aria-checked="false">Version 1</button>
+        <button type="button" role="radio" data-acct-layout="v2" aria-checked="false">Version 2</button>
+      </div>
+      <p class="proto-note">Version 2 shows every section as a tile on desktop and opens it in a side panel. Mobile is the same in both.</p>
       <label class="proto-check"><input type="checkbox" data-acct-proto="dd" />Direct Debit set up</label>
       <label class="proto-check"><input type="checkbox" data-acct-proto="psr" />On the Priority Services Register</label>
       <label class="proto-check"><input type="checkbox" data-acct-proto="fail" />Simulate save failure</label>
@@ -3920,6 +3966,8 @@
     function paintProto() {
       const values = { dd: ddSet(), psr: state.psr.reg, fail: state.fail };
       $$("[data-acct-proto]", proto).forEach((box) => (box.checked = values[box.dataset.acctProto]));
+      const layout = sessionStorage.getItem(ACCOUNT_LAYOUT_KEY) === "v2" ? "v2" : "v1";
+      $$("[data-acct-layout]", proto).forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.acctLayout === layout)));
     }
 
     proto.addEventListener("change", (e) => {
@@ -3932,6 +3980,13 @@
     });
 
     proto.addEventListener("click", (e) => {
+      const layoutBtn = e.target.closest("[data-acct-layout]");
+      if (layoutBtn) {
+        sessionStorage.setItem(ACCOUNT_LAYOUT_KEY, layoutBtn.dataset.acctLayout);
+        paintProto();
+        paintPage();
+        return;
+      }
       if (!e.target.closest("[data-acct-proto-reset]")) return;
       state = accountDefaults();
       save();
