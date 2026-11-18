@@ -3422,6 +3422,7 @@
     initBills();
     initMovingOut();
     initAccount();
+    initPsr();
     $$("[data-sign-out]").forEach((btn) =>
       btn.addEventListener("click", () => {
         session.end();
@@ -3434,16 +3435,64 @@
 
   const ACCOUNT_KEY = "he-account-v2";
   const ACCOUNT_LAYOUT_KEY = "he-account-layout";
-  const PSR_NEEDS = [
-    "Age-related support",
-    "Hearing loss",
-    "Visual impairment",
-    "Chronic illness",
-    "Extra heating needs",
-    "Mobility needs",
-    "Medical equipment that needs power",
-    "[Other needs – PSR team to confirm]",
+  const PSR_CATEGORIES = [
+    {
+      id: "comm",
+      label: "Communication support",
+      icon: '<path d="M2.5 4.2A1.7 1.7 0 0 1 4.2 2.5h9.6a1.7 1.7 0 0 1 1.7 1.7v6.1a1.7 1.7 0 0 1-1.7 1.7H8l-3.6 3v-3h-.2a1.7 1.7 0 0 1-1.7-1.7z" />',
+      needs: ["Unable to communicate in English", "Speech impairment", "Additional presence preferred"],
+    },
+    {
+      id: "hearing",
+      label: "Hearing difficulties",
+      icon: '<path d="M4.5 7a4.5 4.5 0 0 1 9 0c0 2.6-2.6 3.3-2.6 5.6a2.4 2.4 0 0 1-4.6 1" /><path d="M7 7.2a2 2 0 0 1 4 0" />',
+      needs: ["Hearing impairment (including deaf)", "Unable to hear the doorbell or phone"],
+    },
+    {
+      id: "visual",
+      label: "Visual impairments",
+      icon: '<path d="M1.5 9S4.2 4 9 4s7.5 5 7.5 5-2.7 5-7.5 5-7.5-5-7.5-5z" /><circle cx="9" cy="9" r="2.2" />',
+      needs: ["Blind", "Partially sighted", "Need information in large print or braille"],
+    },
+    {
+      id: "age",
+      label: "Age related support",
+      icon: '<path d="M9 15.5s-6-3.6-6-8.1A3.3 3.3 0 0 1 9 5.6a3.3 3.3 0 0 1 6 1.8c0 4.5-6 8.1-6 8.1z" />',
+      needs: ["Pensionable age", "Unable to answer the door quickly"],
+    },
+    {
+      id: "health",
+      label: "Long-term health needs",
+      icon: '<polyline points="1.5,9.5 5,9.5 7,4.5 10.5,14 12.5,9.5 16.5,9.5" />',
+      needs: [
+        "Chronic or serious illness",
+        "Mental health condition",
+        "Dementia or cognitive impairment",
+        "Physical impairment or restricted movement",
+        "Developmental condition",
+        "Recovering from a stay in hospital",
+      ],
+    },
+    {
+      id: "medical",
+      label: "Medical equipment dependency",
+      icon: '<path d="M4 2.5v3.8a3.3 3.3 0 0 0 6.6 0V2.5" /><path d="M7.3 9.6v1.6a3.6 3.6 0 0 0 7.2 0V9.8" /><circle cx="14.5" cy="8.2" r="1.6" />',
+      needs: [
+        "Medically dependent on electricity",
+        "Oxygen use",
+        "Stair lift, hoist or electric bed",
+        "Careline or telecare system",
+        "Medicine that must be kept cold",
+      ],
+    },
+    {
+      id: "other",
+      label: "Other support needs",
+      icon: '<circle cx="9" cy="9" r="6.8" /><path d="M7.1 7.1a1.95 1.95 0 1 1 2.7 1.8c-.5.2-.8.6-.8 1.1v.5M9 12.7h.01" />',
+      needs: ["Poor sense of smell or taste", "Temporary change in circumstances", "Something else"],
+    },
   ];
+  const PSR_NEEDS = PSR_CATEGORIES.flatMap((c) => c.needs);
   const READING_FREQ = { half: "Half-hourly", daily: "Daily", monthly: "Monthly" };
   const ACCOUNT_PAGES = ["login", "contact", "billing", "dd", "psr", "marketing", "smart", "support", "contactus", "faqs"];
   const accountDefaults = () => ({
@@ -3452,7 +3501,15 @@
     mkt: { email: true, phone: false, sms: true },
     freq: "daily",
     dd: { set: null, holder: "Keith Bastian", last4: "4321", sortEnd: "21", day: 1 },
-    psr: { reg: true, date: "12 January 2025", needs: ["Age-related support", "Hearing loss", "Extra heating needs"] },
+    psr: {
+      reg: true,
+      date: "12 January 2025",
+      needs: ["Pensionable age", "Hearing impairment (including deaf)"],
+      household: { pensioners: 1, children: 0, others: 1 },
+      contact: "email",
+      nominee: null,
+      consent: true,
+    },
     fail: false,
   });
   const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : { 1: "st", 2: "nd", 3: "rd" }[n % 10] || "th");
@@ -4213,6 +4270,347 @@
       input.value = "";
       toast("Live chat isn't part of this demo yet");
     });
+  }
+
+  /* ---------- Priority Services Register ---------- */
+
+  function initPsr() {
+    const root = $("[data-psr]");
+    if (!root) return;
+
+    const SCENARIO = "he-psr-scenario";
+    const STEPS = { needs: "Support needs", household: "Household", contact: "Contact and security" };
+    const ORDER = Object.keys(STEPS);
+    const KEY_RULE = /^[A-Za-z0-9]{4,20}$/;
+    const MAX_PEOPLE = 10;
+    const ICON_OK = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m7.5 12.5 3 3 6-6.5" /></svg>';
+    const ICON_ALERT = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 7v6M12 16.5v.5" /></svg>';
+
+    let account;
+    try {
+      account = { ...accountDefaults(), ...JSON.parse(sessionStorage.getItem(ACCOUNT_KEY)) };
+    } catch {
+      account = accountDefaults();
+    }
+    const saved = account.psr || {};
+    const updating = Boolean(saved.reg);
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const modal = $("[data-psr-modal]", root);
+    const submitBtn = $("[data-psr-submit]", root);
+    const keyInput = $('[data-psr-field="key"]', root);
+    const consent = $('[data-psr-field="consent"]', root);
+    const nomineeToggle = $("[data-psr-nominee-toggle]", root);
+    const nomineePanel = $("[data-psr-nominee-panel]", root);
+    const nomineeFields = { name: "nomName", relationship: "nomRel", phone: "nomPhone", email: "nomEmail" };
+    const field = (name) => $(`[data-psr-field="${name}"]`, root);
+    const scenario = () => (sessionStorage.getItem(SCENARIO) === "fail" ? "fail" : "ok");
+    let view = "needs";
+    let triedSubmit = false;
+    let finished = false;
+
+    /* Step 1: support needs */
+    $("[data-psr-chips]", root).innerHTML = PSR_CATEGORIES.map(
+      (c) =>
+        `<button type="button" class="psr-chip" aria-pressed="false" aria-expanded="false" aria-controls="psr-panel-${c.id}" data-psr-chip="${c.id}"><svg class="icon" viewBox="0 0 18 18" aria-hidden="true">${c.icon}</svg>${c.label}</button>`
+    ).join("");
+    $("[data-psr-panels]", root).innerHTML = PSR_CATEGORIES.map(
+      (c) => `<fieldset class="psr-panel" id="psr-panel-${c.id}" data-psr-panel="${c.id}" aria-describedby="psr-err-${c.id}" hidden>
+          <legend>${c.label}</legend>
+          ${c.needs.map((need) => `<label class="psr-check"><input type="checkbox" value="${need}" data-psr-need />${need}</label>`).join("")}
+          ${
+            c.id === "other"
+              ? '<div class="psr-field psr-more"><label for="psr-more">Tell us more <span class="psr-optional">(optional)</span></label><textarea id="psr-more" rows="3" maxlength="200" data-psr-more></textarea></div>'
+              : ""
+          }
+          <p class="psr-error" id="psr-err-${c.id}" hidden>Choose at least one option, or deselect ${c.label.toLowerCase()}.</p>
+        </fieldset>`
+    ).join("");
+
+    const chip = (id) => $(`[data-psr-chip="${id}"]`, root);
+    const panel = (id) => $(`[data-psr-panel="${id}"]`, root);
+    const chosenCategories = () => PSR_CATEGORIES.filter((c) => chip(c.id).getAttribute("aria-pressed") === "true");
+    const chosenNeeds = () => $$("[data-psr-need]:checked", root).map((box) => box.value);
+
+    function panelError(id, on) {
+      panel(id).classList.toggle("is-invalid", on);
+      $(`#psr-err-${id}`, root).hidden = !on;
+    }
+
+    function syncNeeds() {
+      const any = chosenCategories().length > 0;
+      $('[data-psr-next="household"]', root).disabled = !any;
+      $("[data-psr-chip-hint]", root).hidden = any;
+    }
+
+    function setCategory(id, on) {
+      chip(id).setAttribute("aria-pressed", String(on));
+      chip(id).setAttribute("aria-expanded", String(on));
+      panel(id).hidden = !on;
+      if (!on) {
+        $$("[data-psr-need]", panel(id)).forEach((box) => (box.checked = false));
+        const more = $("[data-psr-more]", panel(id));
+        if (more) more.value = "";
+        panelError(id, false);
+      }
+      syncNeeds();
+    }
+
+    function checkNeeds() {
+      const empty = chosenCategories().filter((c) => !$("[data-psr-need]:checked", panel(c.id)));
+      chosenCategories().forEach((c) => panelError(c.id, empty.includes(c)));
+      if (empty.length) $("[data-psr-need]", panel(empty[0].id)).focus();
+      return !empty.length;
+    }
+
+    $("[data-psr-chips]", root).addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-psr-chip]");
+      if (btn) setCategory(btn.dataset.psrChip, btn.getAttribute("aria-pressed") !== "true");
+    });
+    $("[data-psr-panels]", root).addEventListener("change", (e) => {
+      const box = e.target.closest("[data-psr-need]");
+      if (box && box.checked) panelError(box.closest("[data-psr-panel]").dataset.psrPanel, false);
+    });
+
+    /* Step 2: household */
+    const household = {};
+    const live = $("[data-psr-live]", root);
+    $$("[data-psr-count]", root).forEach((row) => {
+      const key = row.dataset.psrCount;
+      const dec = $("[data-psr-dec]", row);
+      const inc = $("[data-psr-inc]", row);
+      const set = (n, announce) => {
+        household[key] = n;
+        $("[data-psr-value]", row).textContent = n;
+        dec.disabled = n <= 0;
+        inc.disabled = n >= MAX_PEOPLE;
+        if (announce) live.textContent = `${row.dataset.label}: ${n}`;
+        if (document.activeElement && document.activeElement.disabled) (dec.disabled ? inc : dec).focus();
+      };
+      set(Math.min(MAX_PEOPLE, Math.max(0, Number(saved.household?.[key]) || 0)), false);
+      dec.addEventListener("click", () => set(household[key] - 1, true));
+      inc.addEventListener("click", () => set(household[key] + 1, true));
+    });
+
+    /* Step 3: contact and security */
+    const contactNote = $("[data-psr-contact-note]", root);
+    function paintContact() {
+      const method = $('input[name="psr-contact"]:checked', root).value;
+      const address = ($("[data-supply-line]") || {}).textContent || "your supply address";
+      contactNote.textContent = method === "email" ? `We’ll email you at ${account.contact.email}.` : `We’ll post letters to ${address.trim()}.`;
+    }
+    $$('input[name="psr-contact"]', root).forEach((radio) => radio.addEventListener("change", paintContact));
+
+    const reveal = $("[data-psr-reveal]", root);
+    reveal.addEventListener("click", () => {
+      const show = keyInput.type === "password";
+      keyInput.type = show ? "text" : "password";
+      reveal.setAttribute("aria-pressed", String(show));
+    });
+
+    function setNominee(open) {
+      nomineeToggle.setAttribute("aria-expanded", String(open));
+      nomineePanel.hidden = !open;
+    }
+    nomineeToggle.addEventListener("click", () => {
+      const open = nomineeToggle.getAttribute("aria-expanded") !== "true";
+      setNominee(open);
+      if (open) field("nomName").focus();
+    });
+    $("[data-psr-nominee-clear]", root).addEventListener("click", () => {
+      Object.values(nomineeFields).forEach((name) => (field(name).value = ""));
+      if (triedSubmit) checkContact(false);
+      setNominee(false);
+      nomineeToggle.focus();
+    });
+
+    const nominee = () => Object.fromEntries(Object.entries(nomineeFields).map(([k, name]) => [k, field(name).value.trim()]));
+    const hasNominee = () => Object.values(nominee()).some(Boolean);
+    const ukPhone = (v) => ACCOUNT_CHECKS.mobile(v) || (Boolean(v) && ACCOUNT_CHECKS.tel(v));
+
+    function contactErrors() {
+      const errors = [];
+      const key = keyInput.value.trim();
+      if (!(updating && !key) && !KEY_RULE.test(key)) {
+        errors.push(["key", key ? "Your security key must be 4 to 20 letters or numbers, with no spaces." : "Create a security key."]);
+      }
+      if (hasNominee()) {
+        const n = nominee();
+        if (!n.name) errors.push(["nomName", "Enter your nominee’s full name."]);
+        if (!n.relationship) errors.push(["nomRel", "Choose how your nominee is related to you."]);
+        if (!ukPhone(n.phone)) errors.push(["nomPhone", n.phone ? "Enter a UK phone number, like 07700 900123." : "Enter your nominee’s phone number."]);
+        if (n.email && !ACCOUNT_CHECKS.email(n.email)) errors.push(["nomEmail", "Enter an email address in the correct format, like name@example.com."]);
+      }
+      if (!consent.checked) errors.push(["consent", "Tick the box to give your consent before you complete registration."]);
+      return errors;
+    }
+
+    function checkContact(focusSummary) {
+      const errors = contactErrors();
+      ["key", ...Object.values(nomineeFields), "consent"].forEach((name) => {
+        const match = errors.find(([n]) => n === name);
+        const el = $(`[data-psr-err="${name}"]`, root);
+        el.textContent = match ? match[1] : "";
+        el.hidden = !match;
+        field(name).setAttribute("aria-invalid", String(Boolean(match)));
+      });
+      const summary = $("[data-psr-errors]", root);
+      summary.hidden = !errors.length;
+      $("[data-psr-error-list]", root).innerHTML = errors
+        .map(([name, text]) => `<li><a href="#${field(name).id}" data-psr-goto="${name}">${text}</a></li>`)
+        .join("");
+      if (errors.some(([name]) => name.startsWith("nom"))) setNominee(true);
+      if (errors.length && focusSummary) summary.focus();
+      return !errors.length;
+    }
+
+    $("[data-psr-errors]", root).addEventListener("click", (e) => {
+      const link = e.target.closest("[data-psr-goto]");
+      if (!link) return;
+      e.preventDefault();
+      field(link.dataset.psrGoto).focus();
+    });
+    $('[data-psr-view="contact"]', root).addEventListener("input", () => triedSubmit && checkContact(false));
+    $('[data-psr-view="contact"]', root).addEventListener("change", () => triedSubmit && checkContact(false));
+
+    /* Moving between steps */
+    function show(next, focus = true) {
+      view = next;
+      $$("[data-psr-view]", root).forEach((section) => (section.hidden = section.dataset.psrView !== next));
+      const steps = $("[data-psr-steps]", root);
+      steps.hidden = next === "done";
+      if (next !== "done") {
+        const n = ORDER.indexOf(next) + 1;
+        $("[data-psr-step]", steps).textContent = `Step ${n} of ${ORDER.length}: ${STEPS[next]}`;
+        const bar = $("[data-psr-progress]", steps);
+        bar.setAttribute("aria-valuenow", String(n));
+        bar.setAttribute("aria-valuetext", `Step ${n} of ${ORDER.length}`);
+        $$("span", bar).forEach((seg, i) => seg.classList.toggle("is-on", i < n));
+      }
+      if (next === "contact") paintContact();
+      document.title = `${next === "done" ? "Registration complete" : STEPS[next]} · Priority Services Register · Home Energy`;
+      if (focus) {
+        $(`[data-psr-view="${next}"] h2`, root).focus({ preventScroll: true });
+        root.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+      }
+    }
+
+    root.addEventListener("click", (e) => {
+      const next = e.target.closest("[data-psr-next]");
+      if (!next) return;
+      if (view === "needs" && next.dataset.psrNext === "household" && !checkNeeds()) return;
+      show(next.dataset.psrNext);
+    });
+
+    /* Result pop-up */
+    function openModal(kind) {
+      const ok = kind !== "fail";
+      const badge = $("[data-psr-modal-badge]", modal);
+      badge.className = `book-badge ${ok ? "is-ok" : "is-alert"}`;
+      badge.innerHTML = ok ? ICON_OK : ICON_ALERT;
+      $("[data-psr-modal-title]", modal).textContent = ok
+        ? updating
+          ? "Your Priority Services details have been updated"
+          : "You’re now registered for Priority Services"
+        : "We couldn’t complete your registration";
+      $("[data-psr-modal-text]", modal).textContent = ok
+        ? "Your additional support preferences have been saved. We’ll ensure you receive the right level of care during outages and when managing your account."
+        : "Sorry, something went wrong on our side. Your answers are still here, so you can try again.";
+      $("[data-psr-modal-actions]", modal).innerHTML = ok
+        ? '<a class="btn btn-primary" href="account.html#psr">Return to your account</a>'
+        : '<button type="button" class="btn btn-primary" data-psr-modal-close>Try again</button>';
+      $("[data-psr-modal-actions]", modal).classList.add("is-single");
+      modal.showModal();
+    }
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal || e.target.closest("[data-psr-modal-close]")) modal.close();
+    });
+    modal.addEventListener("close", () => {
+      if (finished) $('[data-psr-view="done"] h2', root).focus();
+      else submitBtn.focus();
+    });
+
+    const LABEL = updating ? "Save changes" : "Complete registration";
+    submitBtn.textContent = LABEL;
+    submitBtn.addEventListener("click", () => {
+      triedSubmit = true;
+      if (!checkContact(true)) return;
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-busy", "true");
+      submitBtn.textContent = updating ? "Saving…" : "Registering…";
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+        submitBtn.textContent = LABEL;
+        if (scenario() === "fail") {
+          openModal("fail");
+          return;
+        }
+        const n = nominee();
+        account.psr = {
+          reg: true,
+          date: updating ? saved.date : new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }),
+          needs: chosenNeeds(),
+          more: ($("[data-psr-more]", root) || {}).value?.trim() || "",
+          household: { ...household },
+          contact: $('input[name="psr-contact"]:checked', root).value,
+          nominee: hasNominee() ? n : null,
+          consent: true,
+        };
+        sessionStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+        finished = true;
+        keyInput.value = "";
+        $("[data-psr-done-title]", root).textContent = updating ? "Your Priority Services details have been updated" : "You’re now registered for Priority Services";
+        show("done", false);
+        openModal("success");
+      }, 700);
+    });
+
+    /* Prefill when updating an existing registration */
+    if (updating) {
+      $("[data-psr-updating]", root).hidden = false;
+      $("[data-psr-key-hint]", root).textContent = "Use 4 to 20 letters or numbers. Leave this blank to keep your current security key.";
+      $("label[for='psr-key']", root).textContent = "New security key (optional)";
+      const needs = saved.needs || [];
+      PSR_CATEGORIES.forEach((c) => {
+        const ticked = c.needs.filter((need) => needs.includes(need));
+        if (!ticked.length) return;
+        setCategory(c.id, true);
+        $$("[data-psr-need]", panel(c.id)).forEach((box) => (box.checked = ticked.includes(box.value)));
+      });
+      if (saved.more && $("[data-psr-more]", root)) $("[data-psr-more]", root).value = saved.more;
+      const radio = $(`input[name="psr-contact"][value="${saved.contact}"]`, root);
+      if (radio) radio.checked = true;
+      if (saved.nominee) {
+        Object.entries(nomineeFields).forEach(([k, name]) => (field(name).value = saved.nominee[k] || ""));
+        setNominee(true);
+      }
+      consent.checked = Boolean(saved.consent);
+    }
+
+    /* Prototype controls */
+    const paintProto = () => {
+      $$("[data-psr-proto-status]").forEach((btn) => btn.setAttribute("aria-checked", String((btn.dataset.psrProtoStatus === "yes") === updating)));
+      $$("[data-psr-scenario]").forEach((btn) => btn.setAttribute("aria-checked", String(btn.dataset.psrScenario === scenario())));
+    };
+    document.addEventListener("click", (e) => {
+      const status = e.target.closest("[data-psr-proto-status]");
+      if (status) {
+        account.psr = status.dataset.psrProtoStatus === "yes" ? { ...accountDefaults().psr, consent: true } : { reg: false, date: "", needs: [] };
+        sessionStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+        location.reload();
+        return;
+      }
+      const outcome = e.target.closest("[data-psr-scenario]");
+      if (outcome) {
+        sessionStorage.setItem(SCENARIO, outcome.dataset.psrScenario);
+        paintProto();
+      }
+    });
+
+    paintProto();
+    syncNeeds();
+    show("needs", false);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
