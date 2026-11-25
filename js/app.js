@@ -1466,7 +1466,7 @@
       };
       const view = tariffView();
       if (view === "v3") {
-        ["closed", "renew", "no-options", "pay-link", "promo", "entry"].forEach((key) => {
+        ["closed", "no-options", "pay-link", "promo"].forEach((key) => {
           show[key] = false;
         });
       }
